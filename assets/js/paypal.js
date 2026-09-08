@@ -5,8 +5,8 @@
    The PayPal Client ID is public and safe to ship in the browser.
    The PayPal SECRET must NEVER be placed in front-end code — it is
    only ever used on a secure server (e.g. a Cloudflare Worker) to
-   create/capture orders. This file intentionally uses the Client ID
-   only via the PayPal JS SDK.
+   create/capture orders. Orders are created and captured server-side
+   via Cloudflare Pages Functions (/api/create-order, /api/capture-order).
    ========================================================= */
 (function () {
   "use strict";
@@ -14,10 +14,7 @@
   // Keep this in sync with the currency= query param on the PayPal SDK
   // <script> tag in donate.html.
   var PAYPAL_CONFIG = {
-    currency: "USD",      // ISO 4217 — change to "GBP", "EUR", etc. as needed
-    intent: "CAPTURE",
-    defaultAmount: "25.00",
-    description: "One Earth One Breath — donation"
+    defaultAmount: "25.00"
   };
 
   var container = document.getElementById("paypal-button-container");
@@ -66,22 +63,29 @@
         tagline: false
       },
       // Called when the button is clicked — reads the amount live.
-      createOrder: function (data, actions) {
-        return actions.order.create({
-          intent: PAYPAL_CONFIG.intent,
-          purchase_units: [{
-            description: PAYPAL_CONFIG.description,
-            amount: {
-              currency_code: PAYPAL_CONFIG.currency,
-              value: currentAmount()
-            }
-          }]
-        });
+      createOrder: function () {
+        return fetch("/api/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: currentAmount() })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) { return data.id; });
       },
-      onApprove: function (data, actions) {
-        return actions.order.capture().then(function (details) {
-          showThanks(details);
-        });
+      onApprove: function (data) {
+        return fetch("/api/capture-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: data.orderID })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (result) {
+            if (result.status === "COMPLETED") {
+              showThanks(result.details);
+            } else {
+              throw new Error(result.error || "Payment could not be completed.");
+            }
+          });
       },
       onCancel: function () {
         // Payer closed the popup without completing.

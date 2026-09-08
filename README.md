@@ -68,7 +68,15 @@ The **Donate** page uses PayPal's official **Smart Payment Buttons** to process 
 
 The PayPal **Client ID** can live in the browser, but the **Secret Key must never be committed to this repo or embedded in front-end code** — anyone who can read it could make API calls on your behalf.
 
-For the strongest setup, store the secret server-side (for example as a secret in a Cloudflare Worker) and have the Worker create/capture orders via PayPal's Orders API, with the front-end only approving the transaction. The current build uses PayPal's client-side `actions.order.create` + `actions.order.capture`, which needs only the Client ID and works on a static site.
+Orders are created and captured **server-side** by Cloudflare Pages Functions in `functions/api/` (using the Client ID + Secret, stored as Cloudflare secrets), so the secret never reaches the browser. The front-end only sends the amount and the approved order ID.
+
+Set these secrets in Cloudflare (see below): `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, and optionally `PAYPAL_CURRENCY` (defaults to `USD`).
+
+```bash
+wrangler pages secret put PAYPAL_CLIENT_ID --project-name=oneearthonebreath
+wrangler pages secret put PAYPAL_SECRET    --project-name=oneearthonebreath
+wrangler pages secret put PAYPAL_CURRENCY  --project-name=oneearthonebreath  # e.g. USD
+```
 
 ### Testing
 
