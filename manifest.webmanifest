@@ -1,0 +1,16 @@
+{
+  "name": "One Earth One Breath",
+  "short_name": "1E1B",
+  "description": "A climate action collective mobilising communities to protect our shared air, water, and land.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f7f2",
+  "theme_color": "#157a3c",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
