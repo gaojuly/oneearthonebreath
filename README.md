@@ -11,7 +11,7 @@ A modern, high-performance website for the **One Earth One Breath** climate acti
 - **Dark / light mode** with persisted preference + system detection
 - **Animated impact counters**, scroll-reveal animations, and an animated hero
 - **Accessible** — semantic HTML, ARIA labels, keyboard focus states, reduced-motion support
-- **Interactive forms** — newsletter, contact, pledge, and donation (client-side demo wiring)
+- **Real PayPal donations** — Smart Donation Buttons on the Donate page, wired to the selected amount
 - **SEO-ready** — meta descriptions, Open Graph, Twitter cards, `sitemap.xml`, `robots.txt`
 - **Zero build step** — plain HTML/CSS/JS, deployable anywhere
 
@@ -23,12 +23,13 @@ A modern, high-performance website for the **One Earth One Breath** climate acti
 ├── about.html          # Story, values, timeline, team
 ├── issues.html         # Climate crises deep-dive
 ├── take-action.html    # Personal / community / advocacy actions
-├── donate.html         # Monthly tiers + one-time giving
+├── donate.html         # Giving levels + PayPal donation button
 ├── news.html           # Updates & wins
 ├── contact.html        # Contact form + details
 ├── assets/
 │   ├── css/styles.css  # Design system
-│   └── js/main.js      # Interactivity
+│   ├── js/main.js      # Interactivity
+│   └── js/paypal.js    # PayPal Smart Buttons
 ├── favicon.svg
 ├── manifest.webmanifest
 ├── robots.txt
@@ -55,11 +56,29 @@ python3 -m http.server 8000
 
 The included `_headers` file automatically applies security and caching headers.
 
+## 💳 PayPal Donations
+
+The **Donate** page uses PayPal's official **Smart Payment Buttons** to process real donations.
+
+- **Client ID** — public and safe; it's set in the PayPal SDK `<script>` tag at the bottom of `donate.html`.
+- **Amount** — the button charges whatever the visitor enters. Preset buttons, giving-level links, and the custom amount field all feed the same value, which is read live from `#amount` in `assets/js/paypal.js`.
+- **Currency** — defaults to **USD**. To change it, edit (1) the `currency=` query param in the PayPal SDK `<script>` tag in `donate.html`, and (2) the `currency` value at the top of `assets/js/paypal.js`. Then update the `$` symbols on the page to match.
+
+### 🔒 Keep the secret safe
+
+The PayPal **Client ID** can live in the browser, but the **Secret Key must never be committed to this repo or embedded in front-end code** — anyone who can read it could make API calls on your behalf.
+
+For the strongest setup, store the secret server-side (for example as a secret in a Cloudflare Worker) and have the Worker create/capture orders via PayPal's Orders API, with the front-end only approving the transaction. The current build uses PayPal's client-side `actions.order.create` + `actions.order.capture`, which needs only the Client ID and works on a static site.
+
+### Testing
+
+To test without moving real money, create a sandbox app at developer.paypal.com, then temporarily change the SDK URL host from `www.paypal.com` to `www.sandbox.paypal.com`.
+
 ## 🎨 Customisation
 
 - **Brand colours** — edit the CSS variables at the top of `assets/css/styles.css`.
 - **Content** — the page copy is plain HTML and easy to edit.
-- **Forms** — the forms are wired with a demo success message in `assets/js/main.js`. To collect real submissions, connect them to a form backend (e.g. Cloudflare Workers, Formspree, or your CMS).
+- **Forms** — newsletter, contact, and pledge forms are wired with a demo success message in `assets/js/main.js`. To collect real submissions, connect them to a form backend (e.g. Cloudflare Workers, Formspree, or your CMS). Donations are handled by PayPal — see below.
 
 ## 📝 Notes
 
