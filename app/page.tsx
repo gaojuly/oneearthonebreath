@@ -31,11 +31,6 @@ export default function HomePage() {
                 <Link href="/practice" className="btn btn--accent btn--lg">Begin the Practice</Link>
                 <Link href="/vision" className="btn btn--ghost btn--lg" style={{ color: "#fff", borderColor: "rgba(255,255,255,.4)" }}>Our Vision</Link>
               </div>
-              <div className="hero__stats">
-                <div className="hero__stat"><b>5</b><span>core practices</span></div>
-                <div className="hero__stat"><b>12</b><span>regional groups</span></div>
-                <div className="hero__stat"><b>6</b><span>breaths per minute</span></div>
-              </div>
             </div>
 
             <Globe />
