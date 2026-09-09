@@ -65,7 +65,7 @@ export default function Footer() {
           <div className="footer__col">
             <h4>Breathe with us</h4>
             <p style={{ fontSize: "0.95rem", marginBottom: 16 }}>Monthly practice, science, and community updates — no noise.</p>
-            <form className="newsletter" data-form onSubmit={onSubmit}>
+            <form className="newsletter" onSubmit={onSubmit}>
               <input type="email" required placeholder="Your email address" aria-label="Email address" />
               <button className="btn btn--primary btn--sm" type="submit">Join</button>
               <p className="form-message" data-form-message></p>

@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
 };
 
-const themeInit = `(function(){try{var t=localStorage.getItem('1e1b-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}})();`;
+const themeInit = `(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('1e1b-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches)){d.setAttribute('data-theme','dark')}}catch(e){}})();`;
 
 export default function RootLayout({
   children,

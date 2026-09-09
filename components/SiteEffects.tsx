@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 // Runs the "progressive enhancement" effects that used to live in main.js:
 // scroll-reveal, animated counters, and form success handling.
+// Re-runs on every route change so client-side navigations are handled too.
 export default function SiteEffects() {
+  const pathname = usePathname();
+
   useEffect(() => {
     // --- Reveal on scroll ---
     const revealEls = document.querySelectorAll(".reveal");
@@ -85,7 +89,7 @@ export default function SiteEffects() {
       cio?.disconnect();
       handlers.forEach(([form, h]) => form.removeEventListener("submit", h));
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
