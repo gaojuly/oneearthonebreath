@@ -22,8 +22,7 @@ export default function HomePage() {
                 <span className="pulse"></span> A global mindfulness initiative · Dr Junling Gao, HKU
               </span>
               <h1>
-                One Earth.<br />One Breath.<br />
-                <span className="accent-text">One shared practice.</span>
+                One Earth.<br />One Breath.
               </h1>
               <p className="hero__sub">
                 We connect breathing, meditation, and compassion with neuroscience and creative AI — so emotional resilience is within everyone&apos;s reach.
