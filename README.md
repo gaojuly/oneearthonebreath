@@ -1,12 +1,13 @@
 # One Earth One Breath (1e1b.org)
 
-A modern, high-performance website for the **One Earth One Breath** climate action collective.
+A modern, high-performance website for **One Earth One Breath** — a global mindfulness initiative by Dr Junling Gao (The University of Hong Kong), connecting people through breathing, meditation, neuroscience, and AI.
 
 > One planet. One atmosphere. One shared breath.
 
 ## ✨ Features
 
-- **7 pages** — Home, About, Issues, Take Action, Donate, News, Contact
+- **8 pages** — Home, Vision, Science, Practice, Community, Roadmap, Support, Contact
+- **3D Earth globe** in the hero, with a visitor-location marker
 - **Fully responsive** mobile-first layout
 - **Dark / light mode** with persisted preference + system detection
 - **Animated impact counters**, scroll-reveal animations, and an animated hero
@@ -20,15 +21,17 @@ A modern, high-performance website for the **One Earth One Breath** climate acti
 ```
 1e1b.org/
 ├── index.html          # Home
-├── about.html          # Story, values, timeline, team
-├── issues.html         # Climate crises deep-dive
-├── take-action.html    # Personal / community / advocacy actions
-├── donate.html         # Giving levels + PayPal donation button
-├── news.html           # Updates & wins
-├── contact.html        # Contact form + details
+├── vision.html         # Vision for human wellbeing & AI
+├── science.html        # Multimodal Mindfulness Index (MMI)
+├── practice.html       # Ocean breathing & core practices
+├── community.html      # Global mindfulness community
+├── roadmap.html        # Implementation roadmap
+├── support.html        # Spiritual Oasis + PayPal donations
+├── contact.html        # Contact + partners
 ├── assets/
 │   ├── css/styles.css  # Design system
 │   ├── js/main.js      # Interactivity
+│   ├── js/globe.js     # 3D Earth globe (hero)
 │   └── js/paypal.js    # PayPal Smart Buttons
 ├── favicon.svg
 ├── manifest.webmanifest
@@ -58,11 +61,11 @@ The included `_headers` file automatically applies security and caching headers.
 
 ## 💳 PayPal Donations
 
-The **Donate** page uses PayPal's official **Smart Payment Buttons** to process real donations.
+The **Support** page uses PayPal's official **Smart Payment Buttons** to process real donations.
 
-- **Client ID** — public and safe; it's set in the PayPal SDK `<script>` tag at the bottom of `donate.html`.
+- **Client ID** — public and safe; it's set in the PayPal SDK `<script>` tag at the bottom of `support.html`.
 - **Amount** — the button charges whatever the visitor enters. Preset buttons, giving-level links, and the custom amount field all feed the same value, which is read live from `#amount` in `assets/js/paypal.js`.
-- **Currency** — defaults to **USD**. To change it, edit (1) the `currency=` query param in the PayPal SDK `<script>` tag in `donate.html`, and (2) the `currency` value at the top of `assets/js/paypal.js`. Then update the `$` symbols on the page to match.
+- **Currency** — defaults to **USD**. To change it, edit (1) the `currency=` query param in the PayPal SDK `<script>` tag in `support.html`, and (2) the `currency` value at the top of `assets/js/paypal.js`. Then update the `$` symbols on the page to match.
 
 ### 🔒 Keep the secret safe
 
@@ -92,4 +95,4 @@ To test without moving real money, create a sandbox app at developer.paypal.com,
 
 - Fonts load from Google Fonts with a full system-font fallback (works offline).
 - All icons and illustrations are inline SVG — no external image dependencies.
-- Impact figures (supporters, trees, CO₂) are editable placeholders in the markup.
+- Participation figures (people, practices, regions) are editable placeholders in the markup.

@@ -14,11 +14,11 @@
   --surface-soft: #eaf2ea;
   --text: #0f2319;
   --text-muted: #4c6156;
-  --primary: #157a3c;
-  --primary-strong: #0f5c2c;
-  --primary-soft: #d7efdf;
-  --secondary: #0e7490;
-  --secondary-soft: #d3ecf3;
+  --primary: #0e7490;
+  --primary-strong: #0a5a72;
+  --primary-soft: #d5ecf3;
+  --secondary: #6366f1;
+  --secondary-soft: #e3e4ff;
   --accent: #f59e0b;
   --accent-soft: #fde9c8;
   --sky: #38bdf8;
@@ -29,8 +29,8 @@
   --radius: 18px;
   --radius-sm: 12px;
   --max-w: 1180px;
-  --gradient: linear-gradient(135deg, #0e7490 0%, #157a3c 55%, #f59e0b 130%);
-  --gradient-hero: linear-gradient(160deg, #052e21 0%, #0e5a36 48%, #0e7490 100%);
+  --gradient: linear-gradient(135deg, #6366f1 0%, #0e7490 55%, #f59e0b 130%);
+  --gradient-hero: linear-gradient(160deg, #041423 0%, #0a3a52 50%, #0e7490 100%);
   --nav-bg: rgba(243, 247, 242, 0.82);
 }
 
@@ -41,11 +41,11 @@
   --surface-soft: #162a20;
   --text: #e7f2ea;
   --text-muted: #9db5a7;
-  --primary: #34c274;
-  --primary-strong: #57d98e;
-  --primary-soft: #143823;
-  --secondary: #22b8cf;
-  --secondary-soft: #0f2a33;
+  --primary: #2dd4bf;
+  --primary-strong: #5eead4;
+  --primary-soft: #0e2f33;
+  --secondary: #818cf8;
+  --secondary-soft: #1e1b4b;
   --accent: #fbbf24;
   --accent-soft: #3a2c12;
   --sky: #4cc9f0;
@@ -53,8 +53,8 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
-  --gradient: linear-gradient(135deg, #22b8cf 0%, #34c274 55%, #fbbf24 130%);
-  --gradient-hero: linear-gradient(160deg, #04130d 0%, #0c3a22 48%, #0b4d5c 100%);
+  --gradient: linear-gradient(135deg, #818cf8 0%, #2dd4bf 55%, #fbbf24 130%);
+  --gradient-hero: linear-gradient(160deg, #04121f 0%, #0a2a40 50%, #0b3a52 100%);
   --nav-bg: rgba(8, 17, 13, 0.82);
 }
 
@@ -293,7 +293,7 @@ h1, h2, h3, h4, h5 {
   z-index: -1;
   pointer-events: none;
 }
-.hero__glow--1 { width: 480px; height: 480px; background: #22c55e; top: -120px; right: -80px; }
+.hero__glow--1 { width: 480px; height: 480px; background: #6366f1; top: -120px; right: -80px; }
 .hero__glow--2 { width: 420px; height: 420px; background: #0ea5e9; bottom: -140px; left: -60px; }
 .hero__glow--3 { width: 300px; height: 300px; background: #f59e0b; bottom: 40px; right: 18%; opacity: 0.3; }
 
@@ -327,7 +327,7 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 22px;
 }
 .hero h1 .accent-text {
-  background: linear-gradient(90deg, #4ade80, #7dd3fc);
+  background: linear-gradient(90deg, #7dd3fc, #c4b5fd);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
