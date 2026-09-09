@@ -342,7 +342,7 @@ h1, h2, h3, h4, h5 {
 .hero__stat b { display: block; font-family: var(--font-heading); font-size: 1.7rem; color: #fff; line-height: 1; }
 .hero__stat span { font-size: 0.85rem; color: rgba(234, 255, 243, 0.75); }
 
-.hero__visual { position: relative; display: grid; place-items: center; }
+.hero__visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .hero__orbit { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; }
 .hero__planet {
   position: absolute; inset: 22%;
@@ -363,6 +363,21 @@ h1, h2, h3, h4, h5 {
 .hero__ring--2 { inset: 34%; border-style: solid; border-color: rgba(255, 255, 255, 0.2); animation-direction: reverse; animation-duration: 25s; }
 .hero__ring .dot { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; top: -6px; left: 50%; }
 .hero__ring--2 .dot { background: #7dd3fc; }
+.hero__globe { position: absolute; inset: 0; }
+.hero__globe canvas { display: block; width: 100%; height: 100%; }
+.hero__loc {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #eafff3;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 8px 18px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.hero__loc[hidden] { display: none; }
 
 /* ---------- Marquee ---------- */
 .marquee {
