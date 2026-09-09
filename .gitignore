@@ -7,6 +7,9 @@
 # Node / wrangler
 node_modules/
 .wrangler/
+.next/
+out/
+next-env.d.ts
 
 # Cloudflare local dev secrets (never commit)
 .dev.vars

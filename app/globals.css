@@ -4,8 +4,8 @@
    ========================================================= */
 
 :root {
-  --font-heading: "Sora", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Fonts are provided by next/font (see app/layout.tsx) via
+     --font-heading (Sora) and --font-body (Inter). */
 
   /* Light theme */
   --bg: #f3f7f2;

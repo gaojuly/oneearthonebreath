@@ -1,6 +1,6 @@
 # One Earth One Breath (1e1b.org)
 
-A modern, high-performance website for **One Earth One Breath** — a global mindfulness initiative by Dr Junling Gao (The University of Hong Kong), connecting people through breathing, meditation, neuroscience, and AI.
+A dynamic, high-performance web app for **One Earth One Breath** — a global mindfulness initiative by Dr Junling Gao (The University of Hong Kong), connecting people through breathing, meditation, neuroscience, and AI. Built with **Next.js 16 (App Router) + TypeScript**, deployed on Cloudflare.
 
 > One planet. One atmosphere. One shared breath.
 
@@ -13,41 +13,35 @@ A modern, high-performance website for **One Earth One Breath** — a global min
 - **Animated impact counters**, scroll-reveal animations, and an animated hero
 - **Accessible** — semantic HTML, ARIA labels, keyboard focus states, reduced-motion support
 - **Real PayPal donations** — Smart Donation Buttons on the Donate page, wired to the selected amount
-- **SEO-ready** — meta descriptions, Open Graph, Twitter cards, `sitemap.xml`, `robots.txt`
-- **Zero build step** — plain HTML/CSS/JS, deployable anywhere
+- **SEO-ready** — per-page metadata, Open Graph, `sitemap.xml`, `robots.txt`
+- **Dynamic** — server-rendered pages, API route handlers, and a live time-zone schedule
 
 ## 📁 Structure
 
 ```
 1e1b.org/
-├── index.html          # Home
-├── vision.html         # Vision for human wellbeing & AI
-├── science.html        # Multimodal Mindfulness Index (MMI)
-├── practice.html       # Ocean breathing & core practices
-├── community.html      # Global mindfulness community
-├── roadmap.html        # Implementation roadmap
-├── support.html        # Spiritual Oasis + PayPal donations
-├── contact.html        # Contact + partners
-├── assets/
-│   ├── css/styles.css  # Design system
-│   ├── js/main.js      # Interactivity
-│   ├── js/globe.js     # 3D Earth globe (hero)
-│   └── js/paypal.js    # PayPal Smart Buttons
-├── favicon.svg
-├── manifest.webmanifest
-├── robots.txt
-├── sitemap.xml
-└── _headers            # Cloudflare Pages security headers
+├── app/                  # Next.js App Router
+│   ├── layout.tsx        # Root layout (fonts, metadata, Header/Footer)
+│   ├── page.tsx          # Home
+│   ├── globals.css       # Design system
+│   ├── vision/…contact/  # The 7 content pages
+│   └── api/              # PayPal route handlers (create/capture)
+├── components/           # Header, Footer, Globe, PayPalButton, SiteEffects
+├── lib/data.ts           # Typed content (practices, roadmap, regions, partners)
+├── public/               # favicon, manifest, robots.txt, sitemap.xml
+├── next.config.ts
+├── package.json
+└── tsconfig.json
 ```
 
 ## 🚀 Run locally
 
-No dependencies required — just open `index.html` in a browser, or serve the folder:
-
 ```bash
 cd "1e1b.org"
-python3 -m http.server 8000
-# then visit http://localhost:8000
+npm install
+npm run dev     # http://localhost:3000
+# or build + start:
+npm run build && npm start
 ```
 
 ## ☁️ Deploy to Cloudflare Pages
