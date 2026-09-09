@@ -9,6 +9,9 @@ node_modules/
 .wrangler/
 .next/
 out/
+.next/
+.open-next/
+cloudflare-env.d.ts
 next-env.d.ts
 
 # Cloudflare local dev secrets (never commit)
