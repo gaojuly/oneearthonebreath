@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 
 export default function Footer() {
+  const t = useTranslations("Footer");
   const [year, setYear] = useState(2026);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function Footer() {
     const form = e.currentTarget;
     const msg = form.querySelector("[data-form-message]");
     if (msg) {
-      msg.textContent = "Thank you! You're on the list. 🌿";
+      msg.textContent = t("newsletterThanks");
       msg.classList.add("show");
     }
     form.reset();
@@ -32,7 +34,7 @@ export default function Footer() {
               <Logo />
               <span className="brand__name">One Earth One Breath</span>
             </Link>
-            <p>A global mindfulness initiative connecting people through neuroscience and AI — because we all share one breath.</p>
+            <p>{t("tagline")}</p>
             <div className="socials" style={{ marginTop: 22 }}>
               <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg></a>
               <a href="#" aria-label="X (formerly Twitter)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4l16 16M20 4L4 20" /></svg></a>
@@ -42,40 +44,40 @@ export default function Footer() {
           </div>
 
           <div className="footer__col">
-            <h4>Explore</h4>
+            <h4>{t("explore")}</h4>
             <ul>
-              <li><Link href="/vision">Our vision</Link></li>
-              <li><Link href="/science">The science</Link></li>
-              <li><Link href="/practice">The practice</Link></li>
-              <li><Link href="/community">Community</Link></li>
-              <li><Link href="/roadmap">Roadmap</Link></li>
+              <li><Link href="/vision">{t("vision")}</Link></li>
+              <li><Link href="/science">{t("science")}</Link></li>
+              <li><Link href="/practice">{t("practice")}</Link></li>
+              <li><Link href="/community">{t("community")}</Link></li>
+              <li><Link href="/roadmap">{t("roadmap")}</Link></li>
             </ul>
           </div>
 
           <div className="footer__col">
-            <h4>Support</h4>
+            <h4>{t("supportTitle")}</h4>
             <ul>
-              <li><Link href="/support">Donate</Link></li>
-              <li><Link href="/support">Spiritual Oasis</Link></li>
-              <li><Link href="/contact">Partners</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
+              <li><Link href="/support">{t("donate")}</Link></li>
+              <li><Link href="/support">{t("oasis")}</Link></li>
+              <li><Link href="/contact">{t("partners")}</Link></li>
+              <li><Link href="/contact">{t("contact")}</Link></li>
             </ul>
           </div>
 
           <div className="footer__col">
-            <h4>Breathe with us</h4>
-            <p style={{ fontSize: "0.95rem", marginBottom: 16 }}>Monthly practice, science, and community updates — no noise.</p>
+            <h4>{t("newsletterTitle")}</h4>
+            <p style={{ fontSize: "0.95rem", marginBottom: 16 }}>{t("newsletterText")}</p>
             <form className="newsletter" onSubmit={onSubmit}>
-              <input type="email" required placeholder="Your email address" aria-label="Email address" />
-              <button className="btn btn--primary btn--sm" type="submit">Join</button>
+              <input type="email" required placeholder={t("emailPlaceholder")} aria-label={t("emailPlaceholder")} />
+              <button className="btn btn--primary btn--sm" type="submit">{t("join")}</button>
               <p className="form-message" data-form-message></p>
             </form>
           </div>
         </div>
 
         <div className="footer__bottom">
-          <span>© {year} One Earth One Breath · Dr Junling Gao, The University of Hong Kong.</span>
-          <span>One planet. One atmosphere. One shared breath.</span>
+          <span>© {year} {t("copyright")}</span>
+          <span>{t("motto")}</span>
         </div>
       </div>
     </footer>

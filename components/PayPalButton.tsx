@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const CLIENT_ID = "BAACSXrUz2TKKSxbkOC02IqPecn9zaQBjcV1L366T5xa19vXKUpTwsTldzwStbHtTiKnASngfSpciizXBk";
 const DEFAULT_AMOUNT = "25.00";
 
 export default function PayPalButton() {
+  const t = useTranslations("Support");
   const amountRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState("25");
   const [success, setSuccess] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export default function PayPalButton() {
               .then((res: any) => {
                 if (res.status === "COMPLETED") {
                   const given = res.details?.payer?.name?.given_name || "friend";
-                  setSuccess(`Thank you, ${given}! Your gift supports the Spiritual Oasis mission. 🌿`);
+                  setSuccess(t("paypalThanks", { name: given }));
                 }
               }),
           onError: (err: any) => console.error("PayPal error:", err),
@@ -85,13 +87,13 @@ export default function PayPalButton() {
         ))}
       </div>
       <div className="field" style={{ marginTop: 22 }}>
-        <label htmlFor="amount">Amount ($)</label>
+        <label htmlFor="amount">{t("amountLabel")}</label>
         <input ref={amountRef} id="amount" name="amount" type="number" min={1} step="0.01" defaultValue={25} />
       </div>
       <div id="paypal-button-container" style={{ marginTop: 24 }}></div>
       {success && <p className="form-message show" style={{ marginTop: 14 }}>{success}</p>}
       <p style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 16 }}>
-        Payments are processed securely by PayPal. No PayPal account needed.
+        {t("paypalNote")}
       </p>
     </div>
   );

@@ -2,12 +2,14 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 // Runs the "progressive enhancement" effects that used to live in main.js:
 // scroll-reveal, animated counters, and form success handling.
 // Re-runs on every route change so client-side navigations are handled too.
 export default function SiteEffects() {
   const pathname = usePathname();
+  const t = useTranslations("Contact");
 
   useEffect(() => {
     // --- Reveal on scroll ---
@@ -74,7 +76,7 @@ export default function SiteEffects() {
         e.preventDefault();
         const msg = form.querySelector("[data-form-message]");
         if (msg) {
-          msg.textContent = "Thank you! We'll be in touch soon. 🌿";
+          msg.textContent = t("formThanks");
           msg.classList.add("show");
         }
         form.reset();
@@ -89,7 +91,7 @@ export default function SiteEffects() {
       cio?.disconnect();
       handlers.forEach(([form, h]) => form.removeEventListener("submit", h));
     };
-  }, [pathname]);
+  }, [pathname, t]);
 
   return null;
 }

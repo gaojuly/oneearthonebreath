@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
 const TEXTURE_URL = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg";
 
 export default function Globe() {
+  const locale = useLocale();
+  const geocodeLang = locale === "zh-Hant" ? "zh-TW" : "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState<string | null>(null);
 
@@ -15,6 +18,8 @@ export default function Globe() {
 
     let raf = 0;
     let renderer: any = null;
+    let sphereMesh: any = null;
+    let paused = false;
     const cleanupListeners: Array<() => void> = [];
 
     function latLngToVector3(THREE: any, lat: number, lng: number, radius: number) {
@@ -25,6 +30,15 @@ export default function Globe() {
         radius * Math.cos(phi),
         radius * Math.sin(phi) * Math.sin(theta)
       );
+    }
+
+    function vector3ToLatLng(v: any) {
+      const r = v.length();
+      const phi = Math.acos(Math.max(-1, Math.min(1, v.y / r)));
+      const lat = 90 - (phi * 180) / Math.PI;
+      const theta = Math.atan2(v.z, -v.x);
+      const lng = (theta * 180) / Math.PI - 180;
+      return { lat, lng };
     }
 
     function makeGlowTexture(THREE: any) {
@@ -42,7 +56,7 @@ export default function Globe() {
 
     function reverseGeocode(lat: number, lng: number) {
       fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=${geocodeLang}`
       )
         .then((r) => r.json())
         .then((d: any) => {
@@ -68,7 +82,7 @@ export default function Globe() {
         0.1,
         100
       );
-      camera.position.set(0, 0, 3);
+      camera.position.set(0, 0, 2.8);
 
       const globe = new THREE.Group();
       scene.add(globe);
@@ -83,29 +97,80 @@ export default function Globe() {
         TEXTURE_URL,
         (texture: any) => {
           texture.colorSpace = THREE.SRGBColorSpace;
-          globe.add(
-            new THREE.Mesh(
-              new THREE.SphereGeometry(1, 64, 64),
-              new THREE.MeshPhongMaterial({ map: texture, shininess: 8 })
-            )
+          sphereMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 64, 64),
+            new THREE.MeshPhongMaterial({ map: texture, shininess: 8 })
           );
-          globe.add(
-            new THREE.Mesh(
-              new THREE.SphereGeometry(1.08, 64, 64),
-              new THREE.MeshBasicMaterial({
-                color: 0x4cc9f0,
-                transparent: true,
-                opacity: 0.14,
-                side: THREE.BackSide,
-                depthWrite: false,
-              })
-            )
+          globe.add(sphereMesh);
+
+          // Soft atmosphere glow — fades the globe edge into the background.
+          const atmosphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1.15, 64, 64),
+            new THREE.ShaderMaterial({
+              vertexShader: `
+                varying vec3 vNormal;
+                varying vec3 vView;
+                void main() {
+                  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                  vNormal = normalize(normalMatrix * normal);
+                  vView = normalize(-mv.xyz);
+                  gl_Position = projectionMatrix * mv;
+                }
+              `,
+              fragmentShader: `
+                varying vec3 vNormal;
+                varying vec3 vView;
+                void main() {
+                  float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+                  float intensity = pow(rim, 3.0);
+                  gl_FragColor = vec4(0.28, 0.62, 1.0, 1.0) * intensity;
+                }
+              `,
+              side: THREE.BackSide,
+              blending: THREE.AdditiveBlending,
+              transparent: true,
+              depthWrite: false,
+            })
           );
+          globe.add(atmosphere);
+
           runLoop(THREE, renderer, scene, camera, globe, marker);
         },
         undefined,
         () => renderer && renderer.domElement.remove()
       );
+      // Click any point on the globe to reveal its country / exact location.
+      const onClick = (event: MouseEvent) => {
+        if (!sphereMesh) return;
+        const rect = renderer.domElement.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        const intersects = raycaster.intersectObject(sphereMesh);
+        if (intersects.length > 0) {
+          const local = globe.worldToLocal(intersects[0].point.clone());
+          const { lat, lng } = vector3ToLatLng(local);
+          reverseGeocode(lat, lng);
+        }
+      };
+
+      // Pause rotation while hovering.
+      const onEnter = () => {
+        paused = true;
+      };
+      const onLeave = () => {
+        paused = false;
+      };
+
+      renderer.domElement.addEventListener("click", onClick);
+      container.addEventListener("mouseenter", onEnter);
+      container.addEventListener("mouseleave", onLeave);
+      cleanupListeners.push(() => {
+        renderer.domElement.removeEventListener("click", onClick);
+        container.removeEventListener("mouseenter", onEnter);
+        container.removeEventListener("mouseleave", onLeave);
+      });
 
       const onResize = () => {
         const w = container.clientWidth;
@@ -157,7 +222,7 @@ export default function Globe() {
 
       const animate = () => {
         raf = requestAnimationFrame(animate);
-        globe.rotation.y += speed;
+        if (!paused) globe.rotation.y += speed;
         if (marker.glow) {
           marker.t += 0.05;
           const s = 1 + 0.35 * Math.sin(marker.t);
@@ -199,7 +264,6 @@ export default function Globe() {
   return (
     <div className="hero__visual">
       <div className="hero__orbit">
-        <div className="hero__planet" aria-hidden="true" />
         <div className="hero__globe" ref={containerRef} aria-hidden="true" />
       </div>
       <p className="hero__loc" hidden={!label}>
@@ -208,4 +272,3 @@ export default function Globe() {
     </div>
   );
 }
-
