@@ -105,31 +105,63 @@ export default async function HomePage({ params }: Props) {
       </section>
 
       {/* Three pillars */}
-      <section className="section section--alt">
+      <section className="section section--soft">
         <div className="container">
           <div className="section-head center">
             <span className="eyebrow reveal">{t("pillarsEyebrow")}</span>
             <h2 className="reveal">{t("pillarsTitle")}</h2>
             <p className="reveal">{t("pillarsDesc")}</p>
           </div>
-          <div className="grid grid--3">
-            <article className="card reveal">
-              <div className="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12c3-5 6-5 9 0s6 5 9 0" /><path d="M2 17c3-5 6-5 9 0s6 5 9 0" /></svg></div>
-              <h3>{t("pillarPracticeTitle")}</h3>
-              <p>{t("pillarPracticeDesc")}</p>
-              <Link href="/practice">{t("pillarPracticeLink")}</Link>
+          <div className="platform-grid">
+            <article className="platform-card platform-card--practice reveal">
+              <div className="platform-card__media" aria-hidden="true">
+                <span className="platform-card__kicker">01 / 03</span>
+                <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 58c16-26 32-26 46 0s30 26 46 0" />
+                  <path d="M14 82c16-26 32-26 46 0s30 26 46 0" />
+                </svg>
+              </div>
+              <div className="platform-card__body">
+                <h3>{t("pillarPracticeTitle")}</h3>
+                <p>{t("pillarPracticeDesc")}</p>
+                <Link href="/practice" className="platform-card__cta">
+                  {t("pillarPracticeLink")}
+                </Link>
+              </div>
             </article>
-            <article className="card card--teal reveal reveal--delay-1">
-              <div className="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-5 3 10 3-7 2 2h4" /></svg></div>
-              <h3>{t("pillarScienceTitle")}</h3>
-              <p>{t("pillarScienceDesc")}</p>
-              <Link href="/science">{t("pillarScienceLink")}</Link>
+            <article className="platform-card platform-card--science reveal reveal--delay-1">
+              <div className="platform-card__media" aria-hidden="true">
+                <span className="platform-card__kicker">02 / 03</span>
+                <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 64h22l11-30 18 58 16-40 11 12h30" />
+                </svg>
+              </div>
+              <div className="platform-card__body">
+                <h3>{t("pillarScienceTitle")}</h3>
+                <p>{t("pillarScienceDesc")}</p>
+                <Link href="/science" className="platform-card__cta">
+                  {t("pillarScienceLink")}
+                </Link>
+              </div>
             </article>
-            <article className="card card--amber reveal reveal--delay-2">
-              <div className="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /></svg></div>
-              <h3>{t("pillarCommunityTitle")}</h3>
-              <p>{t("pillarCommunityDesc")}</p>
-              <Link href="/community">{t("pillarCommunityLink")}</Link>
+            <article className="platform-card platform-card--feature reveal reveal--delay-2">
+              <div className="platform-card__media" aria-hidden="true">
+                <svg viewBox="0 0 180 150" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="90" cy="75" r="66" strokeDasharray="3 9" opacity="0.65" />
+                  <circle cx="90" cy="75" r="51" />
+                  <path d="M39 75h102M90 24c14 15 21 32 21 51s-7 36-21 51M90 24c-14 15-21 32-21 51s7 36 21 51M47 49c25 10 61 10 86 0M47 101c25-10 61-10 86 0" />
+                </svg>
+              </div>
+              <div className="platform-card__overlay">
+                <div className="platform-card__content">
+                  <span className="platform-card__kicker platform-card__kicker--inline">03 / 03</span>
+                  <h3>{t("pillarCommunityTitle")}</h3>
+                  <p>{t("pillarCommunityDesc")}</p>
+                </div>
+                <Link href="/community" className="platform-card__cta platform-card__cta--ghost">
+                  {t("pillarCommunityLink")}
+                </Link>
+              </div>
             </article>
           </div>
         </div>

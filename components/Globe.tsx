@@ -6,6 +6,116 @@ import { useLocale } from "next-intl";
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
 const TEXTURE_URL = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg";
 
+/* Stylised "network globe" palette — flat blues, as in the reference artwork. */
+const OCEAN = [8, 30, 62];
+const LAND = [50, 156, 212];
+const NET_COLOR = 0xbcd9ff;
+const NET_NODES = 1800;
+const NET_LINK_DIST = 0.2;
+const NET_LINKS_PER_NODE = 3;
+
+/* Repaint the blue-marble photo as two flat blues so the globe reads like the
+   reference: light continents over a deep-navy ocean. */
+function flatEarthTexture(THREE: any, image: any) {
+  const w = 2048;
+  const h = 1024;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(image, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const px = data.data;
+  for (let i = 0; i < px.length; i += 4) {
+    const r = px[i];
+    const g = px[i + 1];
+    const b = px[i + 2];
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    /* Land in the blue marble is warm (browns and greens) or bright snow and
+       ice; the ocean — including the pale continental shelves — is blue.
+       Classifying by hue keeps the continents flat instead of mottled. */
+    const land = r > b + 6 || lum > 150 || (g > b + 8 && lum > 34);
+    px[i] = land ? LAND[0] : OCEAN[0];
+    px[i + 1] = land ? LAND[1] : OCEAN[1];
+    px[i + 2] = land ? LAND[2] : OCEAN[2];
+  }
+  ctx.putImageData(data, 0, 0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function makeNodeTexture(THREE: any) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 32;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.35, "rgba(190,235,255,0.85)");
+  g.addColorStop(1, "rgba(120,200,255,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 32, 32);
+  return new THREE.CanvasTexture(c);
+}
+
+/* Nodes joined by short links, wrapped around the sphere like the reference mesh. */
+function addNetwork(THREE: any, globe: any) {
+  const r = 1.018;
+  const nodes: any[] = [];
+  for (let i = 0; i < NET_NODES; i++) {
+    const y = Math.random() * 2 - 1;
+    const a = Math.random() * Math.PI * 2;
+    const s = Math.sqrt(1 - y * y);
+    nodes.push(new THREE.Vector3(s * Math.cos(a) * r, y * r, s * Math.sin(a) * r));
+  }
+
+  const segments: number[] = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const near: { d: number; j: number }[] = [];
+    for (let j = 0; j < nodes.length; j++) {
+      if (j === i) continue;
+      const d = nodes[i].distanceTo(nodes[j]);
+      if (d < NET_LINK_DIST) near.push({ d, j });
+    }
+    near.sort((p, q) => p.d - q.d);
+    for (const n of near.slice(0, NET_LINKS_PER_NODE)) {
+      segments.push(nodes[i].x, nodes[i].y, nodes[i].z, nodes[n.j].x, nodes[n.j].y, nodes[n.j].z);
+    }
+  }
+  const lineGeo = new THREE.BufferGeometry();
+  lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(segments, 3));
+  globe.add(
+    new THREE.LineSegments(
+      lineGeo,
+      new THREE.LineBasicMaterial({
+        color: NET_COLOR,
+        transparent: true,
+        opacity: 0.3,
+        depthWrite: false,
+      })
+    )
+  );
+
+  const points: number[] = [];
+  nodes.forEach((n) => points.push(n.x, n.y, n.z));
+  const dotGeo = new THREE.BufferGeometry();
+  dotGeo.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
+  globe.add(
+    new THREE.Points(
+      dotGeo,
+      new THREE.PointsMaterial({
+        map: makeNodeTexture(THREE),
+        color: 0xffffff,
+        size: 0.018,
+        transparent: true,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+    )
+  );
+}
+
 export default function Globe() {
   const locale = useLocale();
   const geocodeLang = locale === "zh-Hant" ? "zh-TW" : "en";
@@ -69,75 +179,77 @@ export default function Globe() {
     }
 
     function start(THREE: any) {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      try {
+        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      } catch {
+        /* No WebGL on this device — the CSS glow behind the map remains. */
+        return;
+      }
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       container.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
+      /* A near-orthographic camera: the continents keep their true proportions. */
       const camera = new THREE.PerspectiveCamera(
-        45,
+        26,
         container.clientWidth / container.clientHeight,
         0.1,
         100
       );
-      camera.position.set(0, 0, 2.8);
+      camera.position.set(0, 0, 6);
 
       const globe = new THREE.Group();
+      /* Start centred on the Atlantic at ~18°N, like the reference artwork.
+         (A positive x tilt tips the north pole towards the camera.) */
+      globe.rotation.y = -0.61;
+      globe.rotation.x = 0.31;
       scene.add(globe);
-      scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-      const dir = new THREE.DirectionalLight(0xffffff, 1.4);
-      dir.position.set(4, 2, 6);
+      /* Lit from the upper left, like the reference; a high ambient term keeps
+         the limb bright so the network mesh does not read as an outline.
+         (Intensities are pre-multiplied by π: three r155+ treats light
+         intensity as physical irradiance.) */
+      scene.add(new THREE.AmbientLight(0xffffff, 3));
+      const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+      dir.position.set(-2.4, 3.2, 6);
       scene.add(dir);
 
       const marker: { glow: any; dot: any; t: number } = { glow: null, dot: null, t: 0 };
 
-      new THREE.TextureLoader().load(
+      addNetwork(THREE, globe);
+
+      const loader = new THREE.TextureLoader();
+      loader.setCrossOrigin("anonymous");
+      /* The blue-marble photo is repainted as flat blues once it arrives; the
+         network mesh alone still reads as the globe if it never arrives. */
+      loader.load(
         TEXTURE_URL,
         (texture: any) => {
-          texture.colorSpace = THREE.SRGBColorSpace;
+          let map: any = texture;
+          try {
+            map = flatEarthTexture(THREE, texture.image);
+            texture.dispose?.();
+          } catch {
+            /* Canvas is tainted (CORS) — fall back to the photo. */
+            texture.colorSpace = THREE.SRGBColorSpace;
+          }
           sphereMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(1, 64, 64),
-            new THREE.MeshPhongMaterial({ map: texture, shininess: 8 })
+            new THREE.SphereGeometry(1, 96, 96),
+            new THREE.MeshLambertMaterial({ map })
           );
           globe.add(sphereMesh);
-
-          // Soft atmosphere glow — fades the globe edge into the background.
-          const atmosphere = new THREE.Mesh(
-            new THREE.SphereGeometry(1.15, 64, 64),
-            new THREE.ShaderMaterial({
-              vertexShader: `
-                varying vec3 vNormal;
-                varying vec3 vView;
-                void main() {
-                  vec4 mv = modelViewMatrix * vec4(position, 1.0);
-                  vNormal = normalize(normalMatrix * normal);
-                  vView = normalize(-mv.xyz);
-                  gl_Position = projectionMatrix * mv;
-                }
-              `,
-              fragmentShader: `
-                varying vec3 vNormal;
-                varying vec3 vView;
-                void main() {
-                  float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
-                  float intensity = pow(rim, 3.0);
-                  gl_FragColor = vec4(0.28, 0.62, 1.0, 1.0) * intensity;
-                }
-              `,
-              side: THREE.BackSide,
-              blending: THREE.AdditiveBlending,
-              transparent: true,
-              depthWrite: false,
-            })
-          );
-          globe.add(atmosphere);
-
           runLoop(THREE, renderer, scene, camera, globe, marker);
         },
         undefined,
-        () => renderer && renderer.domElement.remove()
+        () => {
+          sphereMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 64, 64),
+            new THREE.MeshLambertMaterial({ color: (OCEAN[0] << 16) | (OCEAN[1] << 8) | OCEAN[2] })
+          );
+          globe.add(sphereMesh);
+          runLoop(THREE, renderer, scene, camera, globe, marker);
+        }
       );
       // Click any point on the globe to reveal its country / exact location.
       const onClick = (event: MouseEvent) => {
@@ -208,7 +320,7 @@ export default function Globe() {
             glow.scale.set(0.28, 0.28, 1);
             group.add(glow);
             group.position.copy(
-              latLngToVector3(THREE, pos.coords.latitude, pos.coords.longitude, 1.02)
+              latLngToVector3(THREE, pos.coords.latitude, pos.coords.longitude, 1.05)
             );
             globe.add(group);
             marker.glow = glow;

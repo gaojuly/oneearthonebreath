@@ -17,5 +17,9 @@ next-env.d.ts
 # Cloudflare local dev secrets (never commit)
 .dev.vars
 .dev.vars.*
+
 .env
 .env.*
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo

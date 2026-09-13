@@ -366,16 +366,15 @@ h1, h2, h3, h4, h5 {
 
 .hero__visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .hero__orbit { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; }
-.hero__ring {
-  position: absolute; inset: 8%;
-  border: 2px dashed rgba(255, 255, 255, 0.35);
-  border-radius: 50%;
-  animation: spin 40s linear infinite;
+/* Diffuse light behind the map — no ring, outline or frame. */
+.hero__orbit::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at 50% 30%, rgba(84, 196, 235, 0.55) 0%, rgba(38, 146, 197, 0.28) 36%, rgba(10, 40, 80, 0) 70%);
+  pointer-events: none;
 }
-.hero__ring--2 { inset: 34%; border-style: solid; border-color: rgba(255, 255, 255, 0.2); animation-direction: reverse; animation-duration: 25s; }
-.hero__ring .dot { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; top: -6px; left: 50%; }
-.hero__ring--2 .dot { background: #7dd3fc; }
-.hero__globe { position: absolute; inset: 0; cursor: pointer; }
+.hero__globe { position: absolute; inset: 0; cursor: pointer; z-index: 1; }
 .hero__globe canvas { display: block; width: 100%; height: 100%; }
 .hero__loc {
   font-family: var(--font-heading);
@@ -442,6 +441,133 @@ h1, h2, h3, h4, h5 {
 [data-theme="dark"] .card--amber .card__icon { color: var(--accent); }
 .card h3 { font-size: 1.28rem; margin-bottom: 12px; }
 .card p { color: var(--text-muted); font-size: 1.0625rem; }
+
+/* ---------- Platform pillars (home) ----------
+   Two editorial cards (media on top, white body, solid pill CTA)
+   plus one wide feature card (full-bleed media, dark gradient,
+   white headline bottom-left, outlined pill CTA bottom-right). */
+.platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2.1fr;
+  gap: 30px;
+}
+
+.platform-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.platform-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+
+.platform-card__media {
+  position: relative;
+  aspect-ratio: 1 / 1.02;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(145deg, #0a5a72, #0e7490 58%, #38bdf8);
+}
+.platform-card--science .platform-card__media { background: linear-gradient(145deg, #3d40c9, #6366f1 58%, #38bdf8); }
+.platform-card__media svg { width: 54%; height: auto; position: relative; z-index: 1; }
+
+.platform-card__kicker {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 22px;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+.platform-card__kicker--inline { position: static; display: block; margin-bottom: 14px; }
+
+.platform-card__body { display: flex; flex-direction: column; flex: 1; padding: 30px; }
+.platform-card__body h3 { font-size: 1.5rem; margin-bottom: 8px; }
+.platform-card__body p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; margin-bottom: 22px; }
+
+/* Pill CTA — solid on editorial cards, outlined on the feature card */
+.platform-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: auto;
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  padding: 15px 22px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.platform-card__cta:hover {
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+/* Feature card */
+.platform-card--feature { min-height: 470px; background: var(--gradient-hero); }
+.platform-card--feature .platform-card__media {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  background: none;
+  color: rgba(255, 255, 255, 0.34);
+}
+.platform-card--feature .platform-card__media svg { width: min(56%, 340px); }
+
+.platform-card__overlay {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  padding: 36px 36px 38px;
+  background: linear-gradient(0deg, rgba(4, 20, 35, 0.92) 0%, rgba(4, 20, 35, 0.55) 38%, rgba(4, 20, 35, 0) 76%);
+}
+.platform-card__content { flex: 1 1 200px; min-width: 0; }
+.platform-card__overlay h3 {
+  color: #fff;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1;
+}
+.platform-card__overlay p { color: rgba(233, 245, 255, 0.82); font-size: 1rem; line-height: 1.5; margin-top: 12px; }
+
+.platform-card__cta--ghost {
+  align-self: flex-end;
+  justify-content: center;
+  margin-top: 0;
+  margin-left: auto;
+  flex: none;
+  padding: 15px 24px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.85);
+}
+.platform-card__cta--ghost:hover { background: #fff; color: #0f2319; border-color: #fff; }
 
 /* ---------- Split feature ---------- */
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
@@ -559,7 +685,6 @@ h1, h2, h3, h4, h5 {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-16px); }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 .reveal { transition: opacity 0.7s ease, transform 0.7s ease; }
@@ -597,6 +722,13 @@ h1, h2, h3, h4, h5 {
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 
 /* ---------- Responsive ---------- */
+/* Below ~1150px the 1fr / 1fr / 2.1fr row makes the editorial cards too
+   narrow for the pill CTA, so the feature card moves to its own row. */
+@media (max-width: 1150px) {
+  .platform-grid { grid-template-columns: 1fr 1fr; }
+  .platform-card--feature { grid-column: 1 / -1; }
+}
+
 @media (max-width: 1024px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(3) { border-left: none; }
@@ -630,6 +762,12 @@ h1, h2, h3, h4, h5 {
   .nav__toggle { display: flex; }
   .grid--2, .grid--3 { grid-template-columns: 1fr; }
   .grid--4 { grid-template-columns: 1fr 1fr; }
+  .platform-grid { grid-template-columns: 1fr; }
+  .platform-card--feature { grid-column: auto; min-height: 420px; }
+  .platform-card__media svg { width: 46%; }
+  .platform-card__overlay { flex-direction: column; align-items: stretch; gap: 24px; padding: 32px 28px 34px; }
+  .platform-card__content { max-width: 100%; }
+  .platform-card__cta--ghost { align-self: flex-start; margin-left: 0; padding: 16px 26px; }
   .stat:nth-child(2n + 3) { border-left: none; }
   .hero { padding-top: 120px; }
   .hero__stats { gap: 22px; }
