@@ -23,3 +23,6 @@ next-env.d.ts
 
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
+
+# Local design references (not site assets, keep out of the deploy bundle)
+design-references/
