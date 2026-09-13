@@ -4,5 +4,9 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-08-09",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" }
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  // Workers Builds (CI) / `wrangler deploy` run this before deploying, so the
+  // OpenNext worker bundle exists in .open-next/ even when only `wrangler deploy`
+  // is invoked. Keep it in sync with `npm run build` (which stays `next build`).
+  "build": { "command": "npx opennextjs-cloudflare build" }
 }

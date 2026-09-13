@@ -71,10 +71,30 @@ npm run dev     # http://localhost:3000
 ## ☁️ Deploy to Cloudflare Workers
 
 ```bash
+npm run deploy      # OpenNext bundle (.open-next/worker.js) + `wrangler deploy`
+```
+
+Equivalent, step by step (both are fine):
+
+```bash
 npm run build                       # Next.js build (TypeScript check included)
 npx opennextjs-cloudflare build     # bundle the Worker → .open-next/worker.js
 npx wrangler deploy                 # deploy to Cloudflare Workers
 ```
+
+`npx wrangler deploy` also runs the build command configured in `wrangler.jsonc`
+(`build.command`) first, so a bare `wrangler deploy` is enough on CI.
+
+### Continuous deployment (Workers Builds)
+
+The Worker is connected to this GitHub repository through **Cloudflare Workers
+Builds**, which builds and deploys on every push to `main`. If the project's
+build settings are ever reset in the Cloudflare dashboard, use:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Deploy command | `npm run deploy` |
 
 Secrets (set once, kept out of the repo):
 
