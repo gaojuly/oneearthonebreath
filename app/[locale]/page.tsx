@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Globe from "@/components/Globe";
+import { CommunityScene, PracticeScene, ScienceScene } from "@/components/PillarArt";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -113,13 +114,10 @@ export default async function HomePage({ params }: Props) {
             <p className="reveal">{t("pillarsDesc")}</p>
           </div>
           <div className="platform-grid">
-            <article className="platform-card platform-card--practice reveal">
+            <article className="platform-card reveal">
               <div className="platform-card__media" aria-hidden="true">
                 <span className="platform-card__kicker">01 / 03</span>
-                <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 58c16-26 32-26 46 0s30 26 46 0" />
-                  <path d="M14 82c16-26 32-26 46 0s30 26 46 0" />
-                </svg>
+                <PracticeScene />
               </div>
               <div className="platform-card__body">
                 <h3>{t("pillarPracticeTitle")}</h3>
@@ -129,12 +127,10 @@ export default async function HomePage({ params }: Props) {
                 </Link>
               </div>
             </article>
-            <article className="platform-card platform-card--science reveal reveal--delay-1">
+            <article className="platform-card reveal reveal--delay-1">
               <div className="platform-card__media" aria-hidden="true">
                 <span className="platform-card__kicker">02 / 03</span>
-                <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 64h22l11-30 18 58 16-40 11 12h30" />
-                </svg>
+                <ScienceScene />
               </div>
               <div className="platform-card__body">
                 <h3>{t("pillarScienceTitle")}</h3>
@@ -146,15 +142,11 @@ export default async function HomePage({ params }: Props) {
             </article>
             <article className="platform-card platform-card--feature reveal reveal--delay-2">
               <div className="platform-card__media" aria-hidden="true">
-                <svg viewBox="0 0 180 150" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="90" cy="75" r="66" strokeDasharray="3 9" opacity="0.65" />
-                  <circle cx="90" cy="75" r="51" />
-                  <path d="M39 75h102M90 24c14 15 21 32 21 51s-7 36-21 51M90 24c-14 15-21 32-21 51s7 36 21 51M47 49c25 10 61 10 86 0M47 101c25-10 61-10 86 0" />
-                </svg>
+                <span className="platform-card__kicker">03 / 03</span>
+                <CommunityScene />
               </div>
               <div className="platform-card__overlay">
                 <div className="platform-card__content">
-                  <span className="platform-card__kicker platform-card__kicker--inline">03 / 03</span>
                   <h3>{t("pillarCommunityTitle")}</h3>
                   <p>{t("pillarCommunityDesc")}</p>
                 </div>
