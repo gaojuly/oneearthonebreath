@@ -1,0 +1,27 @@
+# Project rules
+
+## Deploying — always to 1e1b.org, always the same account
+
+Every change to this project ships to **https://1e1b.org**, on the
+**Brainclubeast** Cloudflare account (`04ac64317dea9158c772ec0c91465660`), which owns the
+`oneearthonebreath` Worker, the `1e1b.org` zone and the `1e1b.org` / `www.1e1b.org`
+custom domains. This is the only production target for this repository.
+
+- Run **`npm run deploy`** (`scripts/deploy.mjs`). It resolves the account credential,
+  builds the OpenNext bundle, deploys with `wrangler`, and smoke-checks
+  <https://1e1b.org/> and <https://1e1b.org/zh-Hant>.
+- The account is pinned in `wrangler.jsonc` (`account_id`). A bare `wrangler deploy` with the
+  wrong credential therefore fails with `Authentication error [code: 10000]` instead of
+  deploying to another account — never "fix" that by removing `account_id`.
+- Credentials live in `.env.deploy.local` (gitignored). Lookup order:
+  `.env.deploy.local` → `$CF_BRAINCLUB_TOKEN` → `$CLOUDFLARE_API_TOKEN`.
+- **Pushing is not deploying.** Workers Builds (push-to-deploy) currently fails inside that
+  Cloudflare account, so after committing always run `npm run deploy`.
+- Do not deploy this project to any other account — the copy of the Worker in the
+  Kalyanamita account (`oneearthonebreath.kalyanamita26.workers.dev`) is not production.
+
+## Housekeeping
+
+- Keep local design references in `design-references/` (gitignored). Nothing goes in
+  `public/` unless the site actually serves it — everything in `public/` is uploaded with
+  the Worker on every deploy.
