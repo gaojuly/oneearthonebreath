@@ -6,7 +6,7 @@ A dynamic, high-performance web app for **One Earth One Breath** — a global mi
 
 ## ✨ Features
 
-- **8 pages** — Home, Vision, Science, Practice, Community, Roadmap, Support, Contact
+- **7 pages** — Home, Vision, Science, Practice, Community, Support, Contact
 - **🌐 Internationalisation** — English + 繁體中文 (Traditional Chinese), with automatic locale detection by visitor country (see below)
 - **3D Earth globe** in the hero, with a visitor-location marker
 - **Fully responsive** mobile-first layout, dark/light mode, animated counters & scroll-reveal
@@ -44,7 +44,7 @@ No code changes are required — everything is data-driven.
 │   ├── [locale]/              # Locale-routed pages
 │   │   ├── layout.tsx         # <html>/<body>, Header/Footer, NextIntlClientProvider
 │   │   ├── page.tsx           # Home
-│   │   └── vision/…contact/   # The 7 content pages
+│   │   └── vision/…contact/   # The 6 content sub-pages
 │   ├── globals.css            # Design system
 │   └── api/                   # PayPal route handlers (create/capture)
 ├── i18n/

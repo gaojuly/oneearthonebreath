@@ -20,10 +20,6 @@
       "title": "社群 — One Earth One Breath",
       "description": "橫跨 12 個區域時區小組的滾動式全球「正念時刻」——世界各地的共享晚間練習。"
     },
-    "roadmap": {
-      "title": "路線圖 — One Earth One Breath",
-      "description": "One Earth One Breath 的實施路線圖：創始、擴展、全球脈動與整合。"
-    },
     "support": {
       "title": "支持這項使命 — One Earth One Breath",
       "description": "支持心靈綠洲計劃，將正念與靜觀練習帶給資源不足的社群。"
@@ -40,7 +36,6 @@
     "science": "科學",
     "practice": "練習",
     "community": "社群",
-    "roadmap": "路線圖",
     "contact": "聯絡",
     "support": "支持",
     "menu": "開啟選單",
@@ -53,7 +48,6 @@
     "science": "科學基礎",
     "practice": "練習",
     "community": "社群",
-    "roadmap": "路線圖",
     "supportTitle": "支持",
     "donate": "捐款",
     "oasis": "心靈綠洲",
@@ -73,7 +67,6 @@
     "vision": "願景",
     "science": "科學",
     "community": "社群",
-    "roadmap": "路線圖",
     "support": "支持",
     "contact": "聯絡",
     "learnMore": "了解更多"
@@ -118,9 +111,6 @@
     "oasisDesc": "一個讓我們以發展科技的速度來發展內在資源的地方——因為人工智能的未來與人類福祉密不可分。",
     "oasisCta1": "支持這項使命",
     "oasisCta2": "了解更多",
-    "roadmapEyebrow": "路線圖",
-    "roadmapTitle": "從創始到全球脈動",
-    "roadmapCta": "查看完整路線圖",
     "finalCtaTitle": "一起呼吸",
     "finalCtaDesc": "加入一個連結內在福祉與共享未來的全球練習。今天就開始——免費，向所有人開放。",
     "finalCta1": "開始練習",
@@ -134,12 +124,6 @@
       { "name": "開放覺知", "desc": "12 分 7 秒——安住於寬廣、接納的注意力。" },
       { "name": "培養同理心", "desc": "13 分 18 秒——培養對自己與他人的善意。" },
       { "name": "海洋呼吸", "desc": "我們的招牌——每分鐘六次呼吸，由浪潮引導。" }
-    ],
-    "roadmapPhases": [
-      { "name": "創始", "timing": "第一年", "focus": "研究與驗證", "desc": "與學術夥伴合作開發並測試初步的 MMI，包括小波熵研究。重新設計應用程式並製作靜觀藝術原型。推出具有生成式海洋聲音的 Universal 層級最小可行產品。" },
-      { "name": "擴展", "timing": "第二年", "focus": "硬體與教育試點", "desc": "整合相容的 BrainCo FocusCalm 硬體。在香港、倫敦與紐約三地試行晚間接力。在 50 所試點學校引進 STEM+ 模組。" },
-      { "name": "全球脈動", "timing": "第三年", "focus": "社群成長", "desc": "將正念時刻擴展至 12 個區域時區小組。推出具有即時地球視覺化的社群中心。發佈 Terra Nova 神經回饋遊戲。" },
-      { "name": "整合", "timing": "第四年及以後", "focus": "研究合作與更廣泛的普及", "desc": "探索透過 API 對已同意的研究資料進行受管制的存取，以支持有益的 AI 研究。在非洲及更廣泛的全球南方擴展慈善服務。探索全球神經回饋挑戰活動。" }
     ],
     "regions": [
       { "name": "亞太", "cities": "東京 · 悉尼 · 北京 · 馬尼拉" },
@@ -209,8 +193,7 @@
     ],
     "ctaTitle": "對練習本身感到好奇嗎？",
     "ctaDesc": "探索支撐這體驗的五個核心練習，以及以海洋引導的呼吸。",
-    "cta1": "探索練習",
-    "cta2": "查看路線圖"
+    "cta1": "探索練習"
   },
   "Practice": {
     "heroTitle": "練習",
@@ -282,23 +265,6 @@
     "ctaDesc": "共享的專注與意圖，能幫助人們感到不再孤立、更加連結——跨越文化，無需共同語言。",
     "cta1": "開始練習",
     "cta2": "主持課程"
-  },
-  "Roadmap": {
-    "heroTitle": "路線圖",
-    "heroSub": "從研究驗證到全球社群的階段性旅程——以項目啟動起的年份來組織。",
-    "phaseEyebrow": "第一階段所要建立的",
-    "phaseTitle": "從理念到合作夥伴得以評估的體驗",
-    "phaseCards": [
-      { "title": "練習應用程式", "desc": "一個平易近人的 Universal 層級體驗。" },
-      { "title": "MMI 協議", "desc": "指數的初步研究協議。" },
-      { "title": "自適應音頻", "desc": "生成式海洋聲音原型。" },
-      { "title": "社群計劃", "desc": "一項共享參與的務實計劃。" }
-    ],
-    "phaseNote": "後續擴展應以試點的證據為依據。擬議中的學校數量、地理覆蓋範圍與產品發佈皆為目標，而非已達成的成果。",
-    "ctaTitle": "幫助我們打造它",
-    "ctaDesc": "早期的支持，能促成確立可用性、技術可行性、需求與營運成本的研究與產品試點。",
-    "cta1": "支持這項使命",
-    "cta2": "與我們合作"
   },
   "Support": {
     "heroTitle": "支持這項使命",

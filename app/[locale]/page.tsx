@@ -28,7 +28,6 @@ export default async function HomePage({ params }: Props) {
   const practices = d.raw("practices") as { name: string; desc: string }[];
   const marquee = t.raw("marquee") as string[];
   const checklist = t.raw("visionChecklist") as string[];
-  const roadmap = d.raw("roadmapPhases") as { name: string; desc: string }[];
 
   return (
     <main>
@@ -190,28 +189,6 @@ export default async function HomePage({ params }: Props) {
                 <Link href="/vision" className="btn btn--light btn--lg">{t("oasisCta2")}</Link>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Roadmap teaser */}
-      <section className="section section--alt">
-        <div className="container">
-          <div className="section-head center">
-            <span className="eyebrow reveal">{t("roadmapEyebrow")}</span>
-            <h2 className="reveal">{t("roadmapTitle")}</h2>
-          </div>
-          <div className="grid grid--4">
-            {roadmap.map((p, i) => (
-              <article key={p.name} className={`card reveal${i > 0 ? ` reveal--delay-${i}` : ""}`}>
-                <div className="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg></div>
-                <h3>{p.name}</h3>
-                <p>{p.desc}</p>
-              </article>
-            ))}
-          </div>
-          <div className="section-head center" style={{ marginTop: 40, marginBottom: 0 }}>
-            <Link href="/roadmap" className="btn btn--primary">{t("roadmapCta")}</Link>
           </div>
         </div>
       </section>

@@ -99,7 +99,6 @@ export default async function SciencePage({ params }: Props) {
               <p>{t("ctaDesc")}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
                 <Link href="/practice" className="btn btn--accent btn--lg">{t("cta1")}</Link>
-                <Link href="/roadmap" className="btn btn--light btn--lg">{t("cta2")}</Link>
               </div>
             </div>
           </div>

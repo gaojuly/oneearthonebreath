@@ -50,7 +50,6 @@ export default function Footer() {
               <li><Link href="/science">{t("science")}</Link></li>
               <li><Link href="/practice">{t("practice")}</Link></li>
               <li><Link href="/community">{t("community")}</Link></li>
-              <li><Link href="/roadmap">{t("roadmap")}</Link></li>
             </ul>
           </div>
 

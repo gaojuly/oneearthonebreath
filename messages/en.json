@@ -20,10 +20,6 @@
       "title": "Community — One Earth One Breath",
       "description": "A rolling global Mindfulness Hour across 12 regional time-zone groups — shared evening practice around the world."
     },
-    "roadmap": {
-      "title": "Roadmap — One Earth One Breath",
-      "description": "The One Earth One Breath implementation roadmap: Genesis, Expansion, Global Pulse, and Integration."
-    },
     "support": {
       "title": "Support the Mission — One Earth One Breath",
       "description": "Support the Spiritual Oasis programme and help bring mindfulness and contemplative practice to underserved communities."
@@ -40,7 +36,6 @@
     "science": "Science",
     "practice": "Practice",
     "community": "Community",
-    "roadmap": "Roadmap",
     "contact": "Contact",
     "support": "Support",
     "menu": "Open menu",
@@ -53,7 +48,6 @@
     "science": "The science",
     "practice": "The practice",
     "community": "Community",
-    "roadmap": "Roadmap",
     "supportTitle": "Support",
     "donate": "Donate",
     "oasis": "Spiritual Oasis",
@@ -73,7 +67,6 @@
     "vision": "Vision",
     "science": "Science",
     "community": "Community",
-    "roadmap": "Roadmap",
     "support": "Support",
     "contact": "Contact",
     "learnMore": "Learn more"
@@ -118,9 +111,6 @@
     "oasisDesc": "A place to develop our inner resources as rapidly as we develop our technological capabilities — because the future of AI is inseparable from human wellbeing.",
     "oasisCta1": "Support the mission",
     "oasisCta2": "Learn more",
-    "roadmapEyebrow": "The Roadmap",
-    "roadmapTitle": "From Genesis to Global Pulse",
-    "roadmapCta": "See the full roadmap",
     "finalCtaTitle": "Breathe together",
     "finalCtaDesc": "Join a global practice that connects inner wellbeing with a shared future. Begin today — free, and open to everyone.",
     "finalCta1": "Begin the Practice",
@@ -134,12 +124,6 @@
       { "name": "Open Awareness", "desc": "12 min 7 sec — rest in a spacious, receptive attention." },
       { "name": "Developing Empathy", "desc": "13 min 18 sec — cultivate kindness toward self and others." },
       { "name": "Ocean Breathing", "desc": "Our signature — six breaths a minute, guided by the waves." }
-    ],
-    "roadmapPhases": [
-      { "name": "Genesis", "timing": "Year 1", "focus": "Research & validation", "desc": "Develop and test an initial MMI with academic collaborators, including wavelet-entropy research. Redesign the app and prototype contemplative art. Launch a Universal-tier MVP with generative ocean sounds." },
-      { "name": "Expansion", "timing": "Year 2", "focus": "Hardware & education pilots", "desc": "Integrate compatible BrainCo FocusCalm hardware. Pilot the evening relay in Hong Kong, London, and New York. Introduce STEM+ modules in 50 pilot schools." },
-      { "name": "Global Pulse", "timing": "Year 3", "focus": "Community growth", "desc": "Extend the Mindfulness Hour to 12 regional time-zone groups. Launch the community hub with a live globe visualisation. Release the Terra Nova neurofeedback game." },
-      { "name": "Integration", "timing": "Year 4+", "focus": "Research collaboration & wider access", "desc": "Explore governed access to consented research data through an API for beneficial AI research. Expand charitable delivery in Africa and the wider Global South. Explore a global neurofeedback challenge event." }
     ],
     "regions": [
       { "name": "Asia–Pacific", "cities": "Tokyo · Sydney · Beijing · Manila" },
@@ -209,8 +193,7 @@
     ],
     "ctaTitle": "Curious about the practice itself?",
     "ctaDesc": "Explore the five core practices and the ocean-guided breathing that anchor the experience.",
-    "cta1": "Explore the practice",
-    "cta2": "See the roadmap"
+    "cta1": "Explore the practice"
   },
   "Practice": {
     "heroTitle": "The practice",
@@ -282,23 +265,6 @@
     "ctaDesc": "Shared attention and intention can help people feel less isolated and more connected — across cultures and without a common language.",
     "cta1": "Begin the practice",
     "cta2": "Host a session"
-  },
-  "Roadmap": {
-    "heroTitle": "The roadmap",
-    "heroSub": "A phased journey from research validation to global community — organised by years from project commencement.",
-    "phaseEyebrow": "What Phase One Establishes",
-    "phaseTitle": "From ideas to experiences partners can assess",
-    "phaseCards": [
-      { "title": "Practice app", "desc": "An accessible Universal-tier experience." },
-      { "title": "MMI protocol", "desc": "An initial research protocol for the index." },
-      { "title": "Adaptive audio", "desc": "A generative ocean-sound prototype." },
-      { "title": "Community plan", "desc": "A practical plan for shared participation." }
-    ],
-    "phaseNote": "Later expansion follows evidence from pilots. The proposed school count, geographic coverage, and product launches are targets, not reported achievements.",
-    "ctaTitle": "Help us build it",
-    "ctaDesc": "Early support enables the research and product pilots that establish usability, technical feasibility, demand, and operating costs.",
-    "cta1": "Support the mission",
-    "cta2": "Partner with us"
   },
   "Support": {
     "heroTitle": "Support the mission",
