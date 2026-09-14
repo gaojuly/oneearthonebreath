@@ -199,22 +199,6 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      {/* Spiritual Oasis */}
-      <section className="section">
-        <div className="container">
-          <div className="cta-banner reveal">
-            <div>
-              <h2>{t("oasisTitle")}</h2>
-              <p>{t("oasisDesc")}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-                <Link href="/support" className="btn btn--accent btn--lg">{t("oasisCta1")}</Link>
-                <Link href="/vision" className="btn btn--light btn--lg">{t("oasisCta2")}</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Final CTA */}
       <section className="section">
         <div className="container">
