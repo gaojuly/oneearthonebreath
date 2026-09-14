@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Globe from "@/components/Globe";
 import { CommunityScene, PracticeScene, ScienceScene } from "@/components/PillarArt";
+import { HourScene, MMIScene, OasisScene } from "@/components/NewsArt";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -11,29 +12,6 @@ const Check = () => (
     <path d="M20 6 9 17l-5-5" />
   </svg>
 );
-
-const activityTones = ["", "card--teal", "card--amber"];
-
-const activityIcons = [
-  // Research — bars
-  <svg key="research" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 20v-7" />
-    <path d="M10 20V6" />
-    <path d="M16 20v-4" />
-    <path d="M2 20h20" />
-  </svg>,
-  // Community — globe
-  <svg key="community" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9" />
-    <path d="M3 12h18" />
-    <path d="M12 3c2.5 3 2.5 15 0 18-2.5-3-2.5-15 0-18z" />
-  </svg>,
-  // Access — leaf
-  <svg key="access" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 19c0-8 5.5-13 15-14 1 9.5-4 15-15 14z" />
-    <path d="M5 19c3.2-3.4 6.8-6 11-7.6" />
-  </svg>,
-];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -46,6 +24,9 @@ export default async function HomePage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Home");
   const activities = t.raw("activities") as { tag: string; title: string; desc: string }[];
+  // The three home cards use three different layouts (art above, art below,
+  // wide feature), so they are read positionally rather than mapped.
+  const [artTop, artBottom, feature] = activities;
   const marquee = t.raw("marquee") as string[];
   const checklist = t.raw("visionChecklist") as string[];
 
@@ -170,15 +151,50 @@ export default async function HomePage({ params }: Props) {
           <div className="section-head center">
             <h2 className="reveal">{t("activitiesTitle")}</h2>
           </div>
-          <div className="grid grid--3">
-            {activities.map((a, i) => (
-              <article key={a.title} className={`card ${activityTones[i] ?? ""} reveal${i > 0 ? ` reveal--delay-${Math.min(i, 3)}` : ""}`}>
-                <span className="eyebrow">{a.tag}</span>
-                <div className="card__icon">{activityIcons[i % activityIcons.length]}</div>
-                <h3>{a.title}</h3>
-                <p>{a.desc}</p>
+          <div className="news-grid">
+            {/* 1 — artwork above the caption */}
+            {artTop && (
+              <article className="platform-card reveal">
+                <div className="platform-card__media" aria-hidden="true">
+                  <MMIScene />
+                </div>
+                <div className="platform-card__body">
+                  <span className="eyebrow">{artTop.tag}</span>
+                  <h3>{artTop.title}</h3>
+                  <p>{artTop.desc}</p>
+                </div>
               </article>
-            ))}
+            )}
+
+            {/* 2 — caption above the artwork */}
+            {artBottom && (
+              <article className="platform-card reveal reveal--delay-1">
+                <div className="platform-card__body">
+                  <span className="eyebrow">{artBottom.tag}</span>
+                  <h3>{artBottom.title}</h3>
+                  <p>{artBottom.desc}</p>
+                </div>
+                <div className="platform-card__media" aria-hidden="true">
+                  <HourScene />
+                </div>
+              </article>
+            )}
+
+            {/* 3 — wide feature card, matching the pillar row above */}
+            {feature && (
+              <article className="platform-card platform-card--feature reveal reveal--delay-2">
+                <div className="platform-card__media" aria-hidden="true">
+                  <OasisScene />
+                  <span className="platform-card__kicker">{feature.tag}</span>
+                </div>
+                <div className="platform-card__overlay">
+                  <div className="platform-card__content">
+                    <h3>{feature.title}</h3>
+                    <p>{feature.desc}</p>
+                  </div>
+                </div>
+              </article>
+            )}
           </div>
         </div>
       </section>

@@ -8,8 +8,8 @@
      --font-heading (Sora) and --font-body (Inter). */
 
   /* Light theme */
-  --bg: #f3f7f2;
-  --bg-alt: #ffffff;
+  --bg: #ffffff;
+  --bg-alt: #f7faf8;
   --surface: #ffffff;
   --surface-soft: #eaf2ea;
   --text: #0f2319;
@@ -31,7 +31,7 @@
   --max-w: 1180px;
   --gradient: linear-gradient(135deg, #6366f1 0%, #0e7490 55%, #f59e0b 130%);
   --gradient-hero: linear-gradient(160deg, #041423 0%, #0a3a52 50%, #0e7490 100%);
-  --nav-bg: rgba(243, 247, 242, 0.82);
+  --nav-bg: rgba(255, 255, 255, 0.82);
 }
 
 [data-theme="dark"] {
@@ -442,12 +442,14 @@ h1, h2, h3, h4, h5 {
 .card h3 { font-size: 1.28rem; margin-bottom: 12px; }
 .card p { color: var(--text-muted); font-size: 1.0625rem; }
 
-/* ---------- Platform pillars (home) ----------
+/* ---------- Editorial card rows (home) ----------
    Layout follows the reference: two editorial cards (full-bleed art,
    hairline accent rule, white caption bar with a solid pill CTA) plus
    one wide feature card (full-bleed art behind a dark scrim, white
-   headline bottom-left, outlined pill CTA bottom-right). */
-.platform-grid {
+   headline bottom-left, outlined pill CTA bottom-right).
+   Shared by the pillar row and the latest-activities row. */
+.platform-grid,
+.news-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 2.05fr;
   gap: 22px;
@@ -591,6 +593,12 @@ h1, h2, h3, h4, h5 {
   border-color: rgba(255, 255, 255, 0.85);
 }
 .platform-card__cta--ghost:hover { background: #fff; border-color: #fff; color: #0f2319; }
+
+/* Latest-activities row: these cards carry no CTA, so the caption bar
+   drops its trailing gap, and the category pill hugs its own label
+   instead of stretching across the flex column. */
+.news-grid .platform-card__body p { margin-bottom: 0; }
+.news-grid .platform-card__body .eyebrow { align-self: flex-start; }
 
 /* ---------- Split feature ---------- */
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
@@ -759,7 +767,7 @@ h1, h2, h3, h4, h5 {
 /* Below ~1150px the 1fr / 1fr / 2.05fr row makes the editorial cards too
    narrow for the pill CTA, so the feature card moves to its own row. */
 @media (max-width: 1150px) {
-  .platform-grid { grid-template-columns: 1fr 1fr; }
+  .platform-grid, .news-grid { grid-template-columns: 1fr 1fr; }
   .platform-card--feature { grid-column: 1 / -1; min-height: 460px; }
 }
 
@@ -796,7 +804,7 @@ h1, h2, h3, h4, h5 {
   .nav__toggle { display: flex; }
   .grid--2, .grid--3 { grid-template-columns: 1fr; }
   .grid--4 { grid-template-columns: 1fr 1fr; }
-  .platform-grid { grid-template-columns: 1fr; }
+  .platform-grid, .news-grid { grid-template-columns: 1fr; }
   .platform-card { min-height: 430px; }
   .platform-card--feature { grid-column: auto; min-height: 420px; }
   .platform-card__media { min-height: 240px; }
