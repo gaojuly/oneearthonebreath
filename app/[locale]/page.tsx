@@ -152,9 +152,25 @@ export default async function HomePage({ params }: Props) {
             <h2 className="reveal">{t("activitiesTitle")}</h2>
           </div>
           <div className="news-grid">
-            {/* 1 — artwork above the caption */}
+            {/* 1 — wide feature card, leading the row */}
+            {feature && (
+              <article className="platform-card platform-card--feature reveal">
+                <div className="platform-card__media" aria-hidden="true">
+                  <OasisScene />
+                  <span className="platform-card__kicker">{feature.tag}</span>
+                </div>
+                <div className="platform-card__overlay">
+                  <div className="platform-card__content">
+                    <h3>{feature.title}</h3>
+                    <p>{feature.desc}</p>
+                  </div>
+                </div>
+              </article>
+            )}
+
+            {/* 2 — artwork above the caption */}
             {artTop && (
-              <article className="platform-card reveal">
+              <article className="platform-card reveal reveal--delay-1">
                 <div className="platform-card__media" aria-hidden="true">
                   <MMIScene />
                 </div>
@@ -166,9 +182,9 @@ export default async function HomePage({ params }: Props) {
               </article>
             )}
 
-            {/* 2 — caption above the artwork */}
+            {/* 3 — caption above the artwork */}
             {artBottom && (
-              <article className="platform-card reveal reveal--delay-1">
+              <article className="platform-card reveal reveal--delay-2">
                 <div className="platform-card__body">
                   <span className="eyebrow">{artBottom.tag}</span>
                   <h3>{artBottom.title}</h3>
@@ -176,22 +192,6 @@ export default async function HomePage({ params }: Props) {
                 </div>
                 <div className="platform-card__media" aria-hidden="true">
                   <HourScene />
-                </div>
-              </article>
-            )}
-
-            {/* 3 — wide feature card, matching the pillar row above */}
-            {feature && (
-              <article className="platform-card platform-card--feature reveal reveal--delay-2">
-                <div className="platform-card__media" aria-hidden="true">
-                  <OasisScene />
-                  <span className="platform-card__kicker">{feature.tag}</span>
-                </div>
-                <div className="platform-card__overlay">
-                  <div className="platform-card__content">
-                    <h3>{feature.title}</h3>
-                    <p>{feature.desc}</p>
-                  </div>
                 </div>
               </article>
             )}

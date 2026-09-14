@@ -444,17 +444,20 @@ h1, h2, h3, h4, h5 {
 
 /* ---------- Editorial card rows (home) ----------
    Layout follows the reference: two editorial cards (full-bleed art,
-   hairline accent rule, white caption bar with a solid pill CTA) plus
-   one wide feature card (full-bleed art behind a dark scrim, white
-   headline bottom-left, outlined pill CTA bottom-right).
-   Shared by the pillar row and the latest-activities row. */
+   hairline accent rule, white caption bar) plus one wide feature card
+   (full-bleed art behind a dark scrim, white headline bottom-left).
+   Both home rows reuse the same grid and card components; they differ
+   only in which end the wide card sits. */
 .platform-grid,
 .news-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 2.05fr;
   gap: 22px;
   align-items: stretch;
 }
+.platform-grid { grid-template-columns: 1fr 1fr 2.05fr; }
+/* Latest activities: the wide card leads on the left, the two editorial
+   cards sit to its right. */
+.news-grid { grid-template-columns: 2.05fr 1fr 1fr; }
 
 .platform-card {
   --pillar-accent: var(--accent);
