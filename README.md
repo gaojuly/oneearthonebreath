@@ -71,37 +71,70 @@ npm run dev     # http://localhost:3000
 ## ☁️ Deploy to Cloudflare Workers
 
 ```bash
-npm run deploy      # OpenNext bundle (.open-next/worker.js) + `wrangler deploy`
+npm run deploy      # OpenNext bundle + `wrangler deploy` + production smoke check
 ```
 
-Equivalent, step by step (both are fine):
+That is the only command needed. It builds the Worker bundle, deploys it, and then
+checks that <https://1e1b.org/> and <https://1e1b.org/zh-Hant> answer with the
+OpenNext Worker, so a broken deploy fails loudly instead of silently.
+
+### Where production lives
+
+| | |
+| --- | --- |
+| Worker | `oneearthonebreath` |
+| Cloudflare account | `04ac64317dea9158c772ec0c91465660` (Brainclubeast@gmail.com's Account) |
+| Zone / domains | `1e1b.org` + `www.1e1b.org` (custom domains on that Worker) |
+| workers.dev URL | <https://oneearthonebreath.brainclubeast.workers.dev> |
+
+The account is **pinned in `wrangler.jsonc`** (`account_id`), so every deploy —
+`npm run deploy`, a bare `npx wrangler deploy`, or Workers Builds — targets that
+account instead of another account that happens to use the same Worker name.
+
+### Credentials
+
+`npm run deploy` reads its token in this order, using the first one that can
+actually reach the account (it verifies against the Cloudflare API first):
+
+1. `CLOUDFLARE_API_TOKEN` in **`.env.deploy.local`** (gitignored, preferred)
+2. `$CF_BRAINCLUB_TOKEN`
+3. `$CLOUDFLARE_API_TOKEN`
 
 ```bash
-npm run build                       # Next.js build (TypeScript check included)
+# .env.deploy.local  (never committed — .env.* is gitignored)
+CLOUDFLARE_API_TOKEN=<account-scoped token with Workers Scripts:Edit>
+```
+
+### Step by step (equivalent, if you prefer manual control)
+
+```bash
+npm run build                       # Next.js build (includes the TypeScript check)
 npx opennextjs-cloudflare build     # bundle the Worker → .open-next/worker.js
-npx wrangler deploy                 # deploy to Cloudflare Workers
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 npx wrangler deploy
 ```
 
 `npx wrangler deploy` also runs the build command configured in `wrangler.jsonc`
-(`build.command`) first, so a bare `wrangler deploy` is enough on CI.
+(`build.command`), so a bare `wrangler deploy` is enough on CI.
 
 ### Continuous deployment (Workers Builds)
 
 The Worker is connected to this GitHub repository through **Cloudflare Workers
-Builds**, which builds and deploys on every push to `main`. If the project's
-build settings are ever reset in the Cloudflare dashboard, use:
+Builds**. Those builds are currently failing inside the Cloudflare account
+(failing within seconds of every push, independent of the commit), so **pushes do
+not deploy on their own yet — run `npm run deploy`**. If the project's build
+settings are reset in the dashboard, use:
 
 | Setting | Value |
 | --- | --- |
-| Build command | `npm run build` |
-| Deploy command | `npm run deploy` |
+| Build command | `npx opennextjs-cloudflare build` |
+| Deploy command | `npx opennextjs-cloudflare deploy` |
 
 Secrets (set once, kept out of the repo):
 
 ```bash
-wrangler secret put PAYPAL_CLIENT_ID
-wrangler secret put PAYPAL_SECRET
-wrangler secret put PAYPAL_CURRENCY   # e.g. USD
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CLIENT_ID
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_SECRET
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CURRENCY   # e.g. USD
 ```
 
 ## 💳 PayPal Donations

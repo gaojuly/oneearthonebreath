@@ -5,6 +5,11 @@
   "compatibility_date": "2026-08-09",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  // Production lives in the Brainclubeast account, which owns the 1e1b.org zone
+  // and the 1e1b.org / www.1e1b.org custom domains. Pinning the account here means
+  // `wrangler deploy` (and therefore `npm run deploy` and Workers Builds) always
+  // targets that account instead of any other account with the same Worker name.
+  "account_id": "04ac64317dea9158c772ec0c91465660",
   // Workers Builds (CI) / `wrangler deploy` run this before deploying, so the
   // OpenNext worker bundle exists in .open-next/ even when only `wrangler deploy`
   // is invoked. Keep it in sync with `npm run build` (which stays `next build`).
