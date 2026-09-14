@@ -671,21 +671,28 @@ h1, h2, h3, h4, h5 {
 .newsletter input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
 
 /* ---------- Footer ---------- */
-.site-footer { background: #08130d; color: #bcd0c3; padding: 80px 0 0; }
+/* All footer copy is white on the dark background, including links (their hover
+   state stays white and is signalled by an underline instead of a colour shift). */
+.site-footer { background: #08130d; color: #fff; padding: 80px 0 0; }
 [data-theme="dark"] .site-footer { background: #050c08; }
 .footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 40px; padding-bottom: 56px; }
 .footer__brand .brand { color: #fff; margin-bottom: 16px; }
-.footer__brand p { font-size: 1.05rem; max-width: 320px; }
-.footer h4 { color: #fff; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 18px; }
+.footer__brand p { color: #fff; font-size: 1.05rem; max-width: 320px; }
+.site-footer h4 { color: #fff; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 18px; }
+.footer__col p { color: #fff; }
 .footer__col li { margin-bottom: 12px; }
-.footer__col a { color: #bcd0c3; text-decoration: none; transition: color 0.2s ease; }
-.footer__col a:hover { color: #4ade80; text-decoration: none; }
+.footer__col a { color: #fff; text-decoration: none; transition: opacity 0.2s ease; }
+.footer__col a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .socials { display: flex; gap: 10px; }
 .socials a {
   width: 40px; height: 40px; border-radius: 50%;
   display: grid; place-items: center;
   background: rgba(255, 255, 255, 0.08);
-  color: #eafff3;
+  color: #fff;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 .socials a:hover { background: var(--primary); transform: translateY(-3px); }
@@ -694,9 +701,13 @@ h1, h2, h3, h4, h5 {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 22px 0;
   display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+  color: #fff;
   font-size: 0.86rem;
 }
-.footer__bottom a { color: #bcd0c3; }
+.footer__bottom a { color: #fff; }
+/* The newsletter confirmation keeps its own tinted pill, but in the footer it
+   follows the same white-on-dark treatment as the rest of the copy. */
+.site-footer .form-message { background: rgba(255, 255, 255, 0.12); color: #fff; }
 
 /* ---------- Animations ---------- */
 @keyframes pulse {
