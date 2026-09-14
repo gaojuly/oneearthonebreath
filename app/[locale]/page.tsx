@@ -199,18 +199,14 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="section">
-        <div className="container">
-          <div className="cta-banner reveal">
-            <div>
-              <h2>{t("finalCtaTitle")}</h2>
-              <p>{t("finalCtaDesc")}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-                <Link href="/practice" className="btn btn--accent btn--lg">{t("finalCta1")}</Link>
-                <Link href="/support" className="btn btn--light btn--lg">{t("finalCta2")}</Link>
-              </div>
-            </div>
+      {/* Final CTA — full-bleed band that runs straight into the footer */}
+      <section className="footer-cta">
+        <div className="container footer-cta__inner reveal">
+          <h2>{t("finalCtaTitle")}</h2>
+          <p>{t("finalCtaDesc")}</p>
+          <div className="footer-cta__actions">
+            <Link href="/practice" className="btn btn--accent btn--lg">{t("finalCta1")}</Link>
+            <Link href="/support" className="btn btn--light btn--lg">{t("finalCta2")}</Link>
           </div>
         </div>
       </section>
