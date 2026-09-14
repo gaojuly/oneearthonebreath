@@ -65,17 +65,6 @@ export default async function HomePage({ params }: Props) {
         </div>
       </div>
 
-      {/* At a glance */}
-      <section className="stats-band" aria-label="At a glance">
-        <div className="container">
-          <div className="stats-grid">
-            <div className="stat reveal"><b><span data-count="88000">0</span></b><span>{t("statPeople")}</span></div>
-            <div className="stat reveal reveal--delay-1"><b><span data-count="5">0</span></b><span>{t("statPractices")}</span></div>
-            <div className="stat reveal reveal--delay-2"><b><span data-count="12">0</span></b><span>{t("statRegions")}</span></div>
-            <div className="stat reveal reveal--delay-3"><b><span data-count="0.1" data-decimals="1">0</span><span className="suffix">Hz</span></b><span>{t("statRhythm")}</span></div>
-          </div>
-        </div>
-      </section>
       {/* Vision teaser */}
       <section className="section" id="vision">
         <div className="container split">
@@ -108,9 +97,7 @@ export default async function HomePage({ params }: Props) {
       <section className="section section--soft">
         <div className="container">
           <div className="section-head center">
-            <span className="eyebrow reveal">{t("pillarsEyebrow")}</span>
             <h2 className="reveal">{t("pillarsTitle")}</h2>
-            <p className="reveal">{t("pillarsDesc")}</p>
           </div>
           <div className="platform-grid">
             <article className="platform-card reveal">
