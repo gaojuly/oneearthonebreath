@@ -12,7 +12,28 @@ const Check = () => (
   </svg>
 );
 
-const practiceTones = ["", "card--teal", "", "card--amber", "", "card--teal"];
+const activityTones = ["", "card--teal", "card--amber"];
+
+const activityIcons = [
+  // Research — bars
+  <svg key="research" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 20v-7" />
+    <path d="M10 20V6" />
+    <path d="M16 20v-4" />
+    <path d="M2 20h20" />
+  </svg>,
+  // Community — globe
+  <svg key="community" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18" />
+    <path d="M12 3c2.5 3 2.5 15 0 18-2.5-3-2.5-15 0-18z" />
+  </svg>,
+  // Access — leaf
+  <svg key="access" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 19c0-8 5.5-13 15-14 1 9.5-4 15-15 14z" />
+    <path d="M5 19c3.2-3.4 6.8-6 11-7.6" />
+  </svg>,
+];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -24,8 +45,7 @@ export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Home");
-  const d = await getTranslations("Data");
-  const practices = d.raw("practices") as { name: string; desc: string }[];
+  const activities = t.raw("activities") as { tag: string; title: string; desc: string }[];
   const marquee = t.raw("marquee") as string[];
   const checklist = t.raw("visionChecklist") as string[];
 
@@ -144,20 +164,19 @@ export default async function HomePage({ params }: Props) {
           </div>
         </div>
       </section>
-      {/* Core practices */}
+      {/* Latest activities & news */}
       <section className="section">
         <div className="container">
           <div className="section-head center">
-            <span className="eyebrow reveal">{t("practicesEyebrow")}</span>
-            <h2 className="reveal">{t("practicesTitle")}</h2>
-            <p className="reveal">{t("practicesDesc")}</p>
+            <h2 className="reveal">{t("activitiesTitle")}</h2>
           </div>
           <div className="grid grid--3">
-            {practices.map((p, i) => (
-              <article key={p.name} className={`card ${practiceTones[i]} reveal${i > 0 ? ` reveal--delay-${Math.min(i, 3)}` : ""}`}>
-                <div className="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12c3-5 6-5 9 0s6 5 9 0" /></svg></div>
-                <h3>{p.name}</h3>
-                <p>{p.desc}</p>
+            {activities.map((a, i) => (
+              <article key={a.title} className={`card ${activityTones[i] ?? ""} reveal${i > 0 ? ` reveal--delay-${Math.min(i, 3)}` : ""}`}>
+                <span className="eyebrow">{a.tag}</span>
+                <div className="card__icon">{activityIcons[i % activityIcons.length]}</div>
+                <h3>{a.title}</h3>
+                <p>{a.desc}</p>
               </article>
             ))}
           </div>

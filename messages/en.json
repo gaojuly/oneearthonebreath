@@ -98,9 +98,12 @@
     "pillarCommunityTitle": "The Community",
     "pillarCommunityDesc": "Twelve regional groups in a rolling “Mindfulness Hour” that follows the evening around the globe.",
     "pillarCommunityLink": "Explore the community",
-    "practicesEyebrow": "Daily Core Practices",
-    "practicesTitle": "Five practices, one shared breath",
-    "practicesDesc": "Accessible, non-sectarian, and guided by the sound of the ocean.",
+    "activitiesTitle": "Latest Activities and News",
+    "activities": [
+      { "tag": "Research", "title": "A Multimodal Mindfulness Index", "desc": "An index that combines EEG, heart, and breath into understandable feedback, developed and tested with academic collaborators." },
+      { "tag": "Community", "title": "The rolling Mindfulness Hour", "desc": "Twelve regional time-zone groups follow the evening around the globe for a shared practice." },
+      { "tag": "Access", "title": "Spiritual Oasis programme", "desc": "Working with local charities to widen access to contemplative practice in underserved communities." }
+    ],
     "oasisTitle": "Spiritual Oasis: grow your inner world",
     "oasisDesc": "A place to develop our inner resources as rapidly as we develop our technological capabilities — because the future of AI is inseparable from human wellbeing.",
     "oasisCta1": "Support the mission",

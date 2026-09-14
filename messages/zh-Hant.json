@@ -98,9 +98,12 @@
     "pillarCommunityTitle": "社群",
     "pillarCommunityDesc": "十二個區域小組，以滾動式的「正念時刻」跟隨全球的夜晚。",
     "pillarCommunityLink": "探索社群",
-    "practicesEyebrow": "每日核心練習",
-    "practicesTitle": "五個練習，一口共享的呼吸",
-    "practicesDesc": "平易近人、不分宗派，並以海洋之聲引導。",
+    "activitiesTitle": "最新活動與消息",
+    "activities": [
+      { "tag": "研究", "title": "多模態正念指數", "desc": "結合腦電、心臟與呼吸，轉化為易於理解的回饋，並與學術夥伴共同開發與測試。" },
+      { "tag": "社群", "title": "滾動式正念時刻", "desc": "十二個區域時區小組跟隨全球的夜晚，一起共享練習。" },
+      { "tag": "普及", "title": "心靈綠洲計劃", "desc": "與本地慈善機構合作，讓資源不足的社群也能接觸靜觀練習。" }
+    ],
     "oasisTitle": "心靈綠洲：滋養你的內在世界",
     "oasisDesc": "一個讓我們以發展科技的速度來發展內在資源的地方——因為人工智能的未來與人類福祉密不可分。",
     "oasisCta1": "支持這項使命",
