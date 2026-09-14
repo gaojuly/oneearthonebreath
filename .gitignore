@@ -3,6 +3,7 @@
 
 # Logs / temp
 *.log
+nohup.out
 
 # Node / wrangler
 node_modules/
