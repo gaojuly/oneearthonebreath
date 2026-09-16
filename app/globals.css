@@ -389,6 +389,34 @@ h1, h2, h3, h4, h5 {
 .hero__globe { position: absolute; inset: 0; cursor: pointer; z-index: 1; }
 .hero__globe canvas { display: block; width: 100%; height: 100%; }
 .hero__globe:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 4px; border-radius: 50%; }
+/* Google's 3D earth fills the same square as the stylised one and sits a layer
+   below it, so the stylised earth can stand in until the 3D tiles have drawn,
+   then be unmounted to reveal it — with no move in between. */
+.hero__globe--3d { position: absolute; inset: 0; z-index: 0; cursor: grab; }
+.hero__globe--3d:active { cursor: grabbing; }
+.hero__globe3d { display: block; width: 100%; height: 100%; border: 0; }
+/* Back to the whole earth, offered only while the camera is down at a place.
+   Google's own controls and logo stay visible, as its terms require. */
+.hero__globe-reset {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  z-index: 2;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(8, 30, 62, 0.74);
+  color: #eafff3;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.hero__globe-reset:hover { background: rgba(8, 30, 62, 0.9); }
+.hero__globe-reset:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
 /* One pill look for the whole read-out: the visitor's own place, the place
    they pinned, and the hint that invites the first tap. */
 .hero__loc,

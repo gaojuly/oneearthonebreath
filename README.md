@@ -137,6 +137,45 @@ CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPA
 CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CURRENCY   # e.g. USD
 ```
 
+## 🌍 Hero 3D globe (optional Google Maps key)
+
+The home hero shows the **stylised earth** (three.js, `components/globe/Stylised.tsx`)
+out of the box. Set a Google Maps JavaScript API key and the same hero hosts
+**Google's 3D Maps globe** instead — photorealistic 3D tiles — where a tap flies
+the camera down to that point, drops a labelled marker and names the place in the
+read-out underneath.
+
+```bash
+# Worker secret (production)
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put GOOGLE_MAPS_API_KEY
+
+# or a local override while developing (gitignored)
+echo 'GOOGLE_MAPS_API_KEY=AIza…' >> .env.local
+```
+
+Setup in Google Cloud:
+
+1. Create/select a project with **billing enabled** (3D Maps is a paid SKU).
+2. Enable **Maps JavaScript API**.
+3. Create an API key and restrict it by **HTTP referrer** to `https://1e1b.org/*`
+   and `https://www.1e1b.org/*` (the key is necessarily public once the browser
+   loads the SDK — it is served by `app/api/maps-key/route.ts`, never committed).
+4. Optionally restrict it to the Maps JavaScript API.
+
+How it behaves, whatever the key does:
+
+- **No key** → the stylised earth, exactly as before.
+- **Key present** → the stylised earth stands in until Google's first steady
+  frame, then is unmounted, so the hero never shows an empty box while tiles
+  stream. Google's own controls and logo stay visible, as its terms require.
+- **Key invalid, unbilled or blocked, SDK error, tiles never draw** → the
+  component reports it and the stylised earth stays (verified by
+  `/tmp/globe_google_check.mjs`, which runs the hero with a deliberately invalid
+  key and asserts the fallback still names places).
+
+Both earths share the read-out, the reverse geocoding and the clear button
+(`components/Globe.tsx` orchestrates, `components/globe/` holds the pieces).
+
 ## 💳 PayPal Donations
 
 The **Support** page uses PayPal's Smart Payment Buttons. Orders are created/captured **server-side** by route handlers in `app/api/` (Client ID + Secret stored as Cloudflare secrets), so the secret never reaches the browser. Set `PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, and optionally `PAYPAL_CURRENCY` as Worker secrets.
