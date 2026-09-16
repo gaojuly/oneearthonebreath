@@ -15,10 +15,11 @@ const NET_LINK_DIST = 0.2;
 const NET_LINKS_PER_NODE = 3;
 
 /* Repaint the blue-marble photo as two flat blues so the globe reads like the
-   reference: light continents over a deep-navy ocean. */
-function flatEarthTexture(THREE: any, image: any) {
-  const w = 2048;
-  const h = 1024;
+   reference: light continents over a deep-navy ocean. Phones show the globe at
+   ~300px, so they repaint at half resolution (see `compact` in start()). */
+function flatEarthTexture(THREE: any, image: any, size = 2048) {
+  const w = size;
+  const h = size / 2;
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -179,6 +180,10 @@ export default function Globe() {
     }
 
     function start(THREE: any) {
+      /* Small screens render the globe at ~280–320px, so the texture repaint
+         and the sphere tessellation are stepped down to keep the first frame
+         cheap on phones; the mesh is identical everywhere. */
+      const compact = window.matchMedia("(max-width: 1024px)").matches;
       try {
         renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       } catch {
@@ -228,14 +233,14 @@ export default function Globe() {
         (texture: any) => {
           let map: any = texture;
           try {
-            map = flatEarthTexture(THREE, texture.image);
+            map = flatEarthTexture(THREE, texture.image, compact ? 1024 : 2048);
             texture.dispose?.();
           } catch {
             /* Canvas is tainted (CORS) — fall back to the photo. */
             texture.colorSpace = THREE.SRGBColorSpace;
           }
           sphereMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(1, 96, 96),
+            new THREE.SphereGeometry(1, compact ? 64 : 96, compact ? 64 : 96),
             new THREE.MeshLambertMaterial({ map })
           );
           globe.add(sphereMesh);

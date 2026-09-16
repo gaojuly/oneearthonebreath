@@ -812,7 +812,28 @@ h1, h2, h3, h4, h5 {
   .grid--4 { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .hero__inner { grid-template-columns: 1fr; }
-  .hero__visual { display: none; }
+  /* The earth keeps its place on small screens: it shrinks and centres under
+     the copy instead of being dropped. */
+  .hero__visual { gap: 16px; }
+  .hero__orbit { max-width: 320px; margin-inline: auto; }
+  /* In the stacked layout the orbit is no longer tucked into the desktop grid,
+     so its own glow box would show straight seams across the band. Hide it and
+     light the earth with a section-wide wash that fades to nothing at its own
+     edge (the last stop is fully transparent, so no edge can be seen). */
+  .hero__orbit::before { display: none; }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      circle min(60vw, 250px) at 50% 76%,
+      rgba(84, 196, 235, 0.5) 0%,
+      rgba(38, 146, 197, 0.24) 40%,
+      rgba(10, 40, 80, 0) 100%
+    );
+  }
   .cta-banner { grid-template-columns: 1fr; padding: 44px; }
   .footer-cta { padding: 72px 0 56px; }
   .split { grid-template-columns: 1fr; gap: 40px; }
@@ -849,6 +870,9 @@ h1, h2, h3, h4, h5 {
   .platform-card__cta--ghost { align-self: flex-start; margin-left: 0; padding: 16px 26px; }
   .stat:nth-child(2n + 3) { border-left: none; }
   .hero { padding-top: 120px; }
+  .hero__inner { gap: 36px; }
+  .hero__orbit { max-width: 280px; }
+  .hero__loc { font-size: 0.78rem; padding: 7px 15px; }
   .hero__stats { gap: 22px; }
   .footer__grid { grid-template-columns: 1fr; }
   .cta-banner { padding: 32px; }
