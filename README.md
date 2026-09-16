@@ -171,7 +171,17 @@ How it behaves, whatever the key does:
 - **Key invalid, unbilled or blocked, SDK error, tiles never draw** → the
   component reports it and the stylised earth stays (verified by
   `/tmp/globe_google_check.mjs`, which runs the hero with a deliberately invalid
-  key and asserts the fallback still names places).
+  key and asserts the fallback still names places; and by
+  `/tmp/globe_google_live.mjs`, which runs it with a real key and asserts that
+  either Google's globe draws and flies, or the fallback takes over cleanly).
+
+Verified against a real key with **billing off**: Google loads the SDK, the
+`Map3DElement` constructs, but no tiles are served, `gmp-click` never fires and
+its own panel reads "Oops! Something went wrong". That failure does not arrive as
+an element event — it is caught through `window.gm_authFailure` plus a
+steady-frame deadline, and the hero keeps the stylised earth instead. So the hero
+is safe to deploy before billing is enabled, and starts using Google's globe by
+itself once the project is billed.
 
 Both earths share the read-out, the reverse geocoding and the clear button
 (`components/Globe.tsx` orchestrates, `components/globe/` holds the pieces).

@@ -52,10 +52,54 @@ type GoogleEarthProps = {
   resetLabel: string;
 };
 
+/* Google reports a key it will not serve (billing off, API not enabled, a
+   referrer it does not allow) through one global hook, and no element event —
+   without this the hero would keep a blank "Something went wrong" panel. */
+let authFailure: (() => void) | null = null;
+
+function installAuthFailureHook(onFailure: () => void) {
+  authFailure = onFailure;
+  const w = window as any;
+  if (typeof w.gm_authFailure === "function" && w.gm_authFailure.__hero === true) return;
+  const previous = typeof w.gm_authFailure === "function" ? w.gm_authFailure : null;
+  const handler = () => {
+    try {
+      previous?.();
+    } catch {
+      /* an earlier handler must not stop ours */
+    }
+    authFailure?.();
+  };
+  handler.__hero = true;
+  w.gm_authFailure = handler;
+}
+
+/* The `loading=async` loader is a bootstrap: it defines `google.maps` and then
+   injects the library scripts, so `importLibrary` only appears a moment after
+   the script's load event. Wait for it. */
+function whenImportLibraryReady(timeoutMs = 12000): Promise<any> {
+  const started = Date.now();
+  return new Promise((resolve, reject) => {
+    const tick = () => {
+      const maps = (window as any).google?.maps;
+      if (typeof maps?.importLibrary === "function") {
+        resolve(maps.importLibrary("maps3d"));
+        return;
+      }
+      if (Date.now() - started > timeoutMs) {
+        reject(new Error("Google Maps SDK never exposed importLibrary"));
+        return;
+      }
+      window.setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
 /* One SDK load per page, shared by every mount. */
 function loadMaps(apiKey: string, language: string): Promise<any> {
   const w = window as any;
-  if (w.google?.maps?.importLibrary) return w.google.maps.importLibrary("maps3d");
+  if (typeof w.google?.maps?.importLibrary === "function") return w.google.maps.importLibrary("maps3d");
   if (w.__hero3dMaps) return w.__hero3dMaps;
   w.__hero3dMaps = new Promise((resolve, reject) => {
     const script = document.createElement("script");
@@ -69,11 +113,7 @@ function loadMaps(apiKey: string, language: string): Promise<any> {
     script.src = `${BOOTSTRAP}?${params}`;
     script.async = true;
     script.onerror = () => reject(new Error("Google Maps SDK failed to load"));
-    script.onload = () => {
-      const maps = (window as any).google?.maps;
-      if (maps?.importLibrary) resolve(maps.importLibrary("maps3d"));
-      else reject(new Error("Google Maps SDK loaded without the maps3d library"));
-    };
+    script.onload = () => whenImportLibraryReady().then(resolve, reject);
     document.head.appendChild(script);
   });
   return w.__hero3dMaps;
@@ -146,13 +186,19 @@ export default function GoogleEarth({
       .then((library: any) => {
         if (cancelled) return;
         libraryRef.current = library;
+        installAuthFailureHook(() => {
+          failed = true;
+          window.clearTimeout(steadyTimer);
+          errorRef.current();
+        });
         const Map3DElement = library.Map3DElement;
         const map = new Map3DElement({
           ...WORLD_CAMERA,
           mode: "HYBRID",
           /* Cooperative: one finger still scrolls the page, two fingers work the
-             globe, and a single tap is a click. */
-          gestureHandling: "cooperative",
+             globe, and a single tap is a click. Note the enum values are upper
+             case — "cooperative" makes the element constructor throw. */
+          gestureHandling: "COOPERATIVE",
           description,
         });
         map.className = "hero__globe3d";
@@ -163,16 +209,21 @@ export default function GoogleEarth({
         host.appendChild(map);
         mapRef.current = map;
         setReadyToken((n) => n + 1);
-        /* If the steady-state event never arrives (an older SDK, a stalled
-           network) reveal the map anyway, so it cannot hide behind the
-           stylised earth for good — unless it has already reported a failure,
-           in which case the stylised earth is the right thing to keep. */
+        /* No steady frame inside the budget: treat that as a failure rather than
+           revealing a map that may never draw, so a working stylised earth is
+           never replaced by an empty one. */
         steadyTimer = window.setTimeout(() => {
-          if (!failed) steadyRef.current();
-        }, 8000);
+          failed = true;
+          errorRef.current();
+        }, 12000);
       })
-      .catch(() => {
-        if (!cancelled) errorRef.current();
+      .catch((reason: unknown) => {
+        if (cancelled) return;
+        /* A key that exists but cannot draw (not enabled, no billing, a
+           restricted referrer, a bad option) is worth saying out loud: the hero
+           falls back to the stylised earth either way. */
+        console.warn("[hero] Google 3D globe unavailable, using the stylised earth:", reason);
+        errorRef.current();
       });
 
     return () => {
