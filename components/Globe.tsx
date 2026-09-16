@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
 const TEXTURE_URL = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg";
@@ -13,6 +13,32 @@ const NET_COLOR = 0xbcd9ff;
 const NET_NODES = 1800;
 const NET_LINK_DIST = 0.2;
 const NET_LINKS_PER_NODE = 3;
+
+/* The pinned place is ice blue with a white pin, deliberately unlike the red
+   dot that marks the visitor's own position. */
+const YOU_COLOR = 0xff4d5e;
+const YOU_GLOW = [255, 90, 90] as const;
+const PIN_COLOR = 0xf4fbff;
+const PIN_GLOW = [150, 232, 255] as const;
+
+/* "35.0°N, 135.8°E" — the exact reading, kept under the name of the place. */
+function formatCoords(lat: number, lng: number) {
+  const ns = lat >= 0 ? "N" : "S";
+  const ew = lng >= 0 ? "E" : "W";
+  return `${Math.abs(lat).toFixed(1)}°${ns}, ${Math.abs(lng).toFixed(1)}°${ew}`;
+}
+
+/* The most specific name the geocoder knows for a point — "Nakagyo Ku, Kyoto,
+   Japan" rather than just the country. Repeats collapse, so a city that is
+   also its own region is still named once. Returns "" out at sea. */
+function formatPlace(d: any) {
+  const parts: string[] = [
+    d.locality || d.city,
+    d.principalSubdivision,
+    d.countryName,
+  ].filter(Boolean);
+  return parts.filter((part, i) => parts.indexOf(part) === i).join(", ");
+}
 
 /* Repaint the blue-marble photo as two flat blues so the globe reads like the
    reference: light continents over a deep-navy ocean. Phones show the globe at
@@ -117,11 +143,20 @@ function addNetwork(THREE: any, globe: any) {
   );
 }
 
+/* What the pin resolved to: the place name, the exact coordinates it landed
+   on, and whether the lookup is still in flight. */
+type PinnedPlace = { name: string | null; coords: string; loading: boolean };
+
 export default function Globe() {
   const locale = useLocale();
+  const t = useTranslations("Home");
   const geocodeLang = locale === "zh-Hant" ? "zh-TW" : "en";
   const containerRef = useRef<HTMLDivElement>(null);
+  /* Lets the clear button reach the 3D pin, which lives inside the effect. */
+  const clearPinRef = useRef<() => void>(() => {});
   const [label, setLabel] = useState<string | null>(null);
+  const [place, setPlace] = useState<PinnedPlace | null>(null);
+  const [explored, setExplored] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current!;
@@ -132,6 +167,9 @@ export default function Globe() {
     let sphereMesh: any = null;
     let paused = false;
     const cleanupListeners: Array<() => void> = [];
+    /* Last coordinates the browser reported for the visitor: the red dot, and
+       where a keyboard traversal starts from. */
+    const self = { lat: 0, lng: 0 };
 
     function latLngToVector3(THREE: any, lat: number, lng: number, radius: number) {
       const phi = ((90 - lat) * Math.PI) / 180;
@@ -147,36 +185,72 @@ export default function Globe() {
       const r = v.length();
       const phi = Math.acos(Math.max(-1, Math.min(1, v.y / r)));
       const lat = 90 - (phi * 180) / Math.PI;
-      const theta = Math.atan2(v.z, -v.x);
-      const lng = (theta * 180) / Math.PI - 180;
+      const theta = (Math.atan2(v.z, -v.x) * 180) / Math.PI;
+      /* atan2 spans -180..180, which maps to -360..0 here; folding it back keeps
+         longitudes inside -180..180 so eastern places are named and plotted
+         (and geocoded) with the longitude everyone else uses. */
+      const lngDeg = theta - 180;
+      const lng = lngDeg < -180 ? lngDeg + 360 : lngDeg;
       return { lat, lng };
     }
 
-    function makeGlowTexture(THREE: any) {
+    function makeGlowTexture(THREE: any, rgb: readonly [number, number, number] = YOU_GLOW) {
       const c = document.createElement("canvas");
       c.width = c.height = 64;
       const ctx = c.getContext("2d")!;
       const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      const [red, green, blue] = rgb;
       g.addColorStop(0, "rgba(255,255,255,0.95)");
-      g.addColorStop(0.3, "rgba(255,90,90,0.9)");
-      g.addColorStop(1, "rgba(255,90,90,0)");
+      g.addColorStop(0.3, `rgba(${red},${green},${blue},0.9)`);
+      g.addColorStop(1, `rgba(${red},${green},${blue},0)`);
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     }
 
-    function reverseGeocode(lat: number, lng: number) {
-      fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=${geocodeLang}`
-      )
-        .then((r) => r.json())
+    /* Key-less reverse geocoding; the answer comes back in the page language. */
+    function geocodeUrl(lat: number, lng: number) {
+      return `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=${geocodeLang}`;
+    }
+
+    function lookup(lat: number, lng: number) {
+      return fetch(geocodeUrl(lat, lng)).then((res) => {
+        if (!res.ok) throw new Error(String(res.status));
+        return res.json();
+      });
+    }
+
+    /* Where the visitor actually is, resolved once the browser shares it. */
+    function nameVisitorPosition(lat: number, lng: number) {
+      const coords = formatCoords(lat, lng);
+      lookup(lat, lng)
+        .then((d: any) => setLabel(formatPlace(d) || coords))
+        .catch(() => setLabel(coords));
+    }
+
+    /* A point the visitor picked. Newest lookup always wins, and an area that
+       has already been named is answered from memory instead of the network. */
+    let geocodeToken = 0;
+    const geocodeCache = new Map<string, string>();
+
+    function namePinnedPlace(lat: number, lng: number) {
+      const coords = formatCoords(lat, lng);
+      const key = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+      const known = geocodeCache.get(key);
+      const token = ++geocodeToken;
+      setPlace({ name: known ?? null, coords, loading: !known });
+      if (known) return;
+      const settle = (name: string) => {
+        if (token !== geocodeToken) return;
+        setPlace({ name, coords, loading: false });
+      };
+      lookup(lat, lng)
         .then((d: any) => {
-          const city = d.city || d.locality || "";
-          const country = d.countryName || "";
-          const text = [city, country].filter(Boolean).join(", ");
-          setLabel(text || `${lat.toFixed(1)}°, ${lng.toFixed(1)}°`);
+          const name = formatPlace(d) || coords;
+          geocodeCache.set(key, name);
+          settle(name);
         })
-        .catch(() => setLabel(`${lat.toFixed(1)}°, ${lng.toFixed(1)}°`));
+        .catch(() => settle(coords));
     }
 
     function start(THREE: any) {
@@ -222,6 +296,67 @@ export default function Globe() {
 
       const marker: { glow: any; dot: any; t: number } = { glow: null, dot: null, t: 0 };
 
+      /* The pin for a picked point: a white stem standing off the surface with
+         a small head and a halo, so it reads against land and ocean alike. It
+         hangs off `globe`, so it turns with the earth. */
+      const pin: {
+        stem: any;
+        head: any;
+        halo: any;
+        t: number;
+        lat: number | null;
+        lng: number;
+      } = { stem: null, head: null, halo: null, t: 0, lat: null, lng: 0 };
+
+      function setPin(lat: number, lng: number) {
+        const up = latLngToVector3(THREE, lat, lng, 1).normalize();
+        if (!pin.stem) {
+          const material = new THREE.MeshBasicMaterial({ color: PIN_COLOR });
+          pin.stem = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.15, 8), material);
+          pin.head = new THREE.Mesh(new THREE.SphereGeometry(0.021, 16, 16), material);
+          pin.halo = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: makeGlowTexture(THREE, PIN_GLOW),
+              transparent: true,
+              opacity: 0.9,
+              depthWrite: false,
+            })
+          );
+          pin.halo.scale.set(0.26, 0.26, 1);
+          globe.add(pin.stem);
+          globe.add(pin.head);
+          globe.add(pin.halo);
+        }
+        pin.stem.position.copy(up.clone().multiplyScalar(1.075));
+        pin.stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
+        pin.head.position.copy(up.clone().multiplyScalar(1.15));
+        pin.halo.position.copy(pin.head.position);
+        pin.stem.visible = true;
+        pin.head.visible = true;
+        pin.halo.visible = true;
+        pin.lat = lat;
+        pin.lng = lng;
+      }
+
+      /* Drop the pin on a point and name it — shared by clicks, taps and the
+         arrow-key traversal below, so every route behaves the same. */
+      function pinPlace(lat: number, lng: number) {
+        setExplored(true);
+        setPin(lat, lng);
+        namePinnedPlace(lat, lng);
+      }
+
+      function clearPin() {
+        if (pin.stem) {
+          pin.stem.visible = false;
+          pin.head.visible = false;
+          pin.halo.visible = false;
+        }
+        pin.lat = null;
+        setPlace(null);
+      }
+      clearPinRef.current = clearPin;
+
       addNetwork(THREE, globe);
 
       const loader = new THREE.TextureLoader();
@@ -244,7 +379,7 @@ export default function Globe() {
             new THREE.MeshLambertMaterial({ map })
           );
           globe.add(sphereMesh);
-          runLoop(THREE, renderer, scene, camera, globe, marker);
+          runLoop(THREE, renderer, scene, camera, globe, marker, pin);
         },
         undefined,
         () => {
@@ -253,10 +388,11 @@ export default function Globe() {
             new THREE.MeshLambertMaterial({ color: (OCEAN[0] << 16) | (OCEAN[1] << 8) | OCEAN[2] })
           );
           globe.add(sphereMesh);
-          runLoop(THREE, renderer, scene, camera, globe, marker);
+          runLoop(THREE, renderer, scene, camera, globe, marker, pin);
         }
       );
-      // Click any point on the globe to reveal its country / exact location.
+      /* Click or tap anywhere on the earth: the ray that hits the sphere gives
+         the coordinates, the pin marks them and the geocoder names them. */
       const onClick = (event: MouseEvent) => {
         if (!sphereMesh) return;
         const rect = renderer.domElement.getBoundingClientRect();
@@ -268,8 +404,42 @@ export default function Globe() {
         if (intersects.length > 0) {
           const local = globe.worldToLocal(intersects[0].point.clone());
           const { lat, lng } = vector3ToLatLng(local);
-          reverseGeocode(lat, lng);
+          pinPlace(lat, lng);
+          /* Keep the focus the visitor just established, so the arrow keys
+             carry on from the point they picked. */
+          container.focus({ preventScroll: true });
         }
+      };
+
+      /* The globe is focusable, so the arrow keys walk the same pin over the
+         surface (Shift for 15° steps) and Escape clears it. */
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (pin.lat === null) {
+          pin.lat = self.lat;
+          pin.lng = self.lng;
+        }
+        const step = event.shiftKey ? 15 : 5;
+        switch (event.key) {
+          case "ArrowUp":
+            pin.lat = Math.min(85, pin.lat + step);
+            break;
+          case "ArrowDown":
+            pin.lat = Math.max(-85, pin.lat - step);
+            break;
+          case "ArrowLeft":
+            pin.lng = pin.lng - step < -180 ? 180 : pin.lng - step;
+            break;
+          case "ArrowRight":
+            pin.lng = pin.lng + step > 180 ? -180 : pin.lng + step;
+            break;
+          case "Escape":
+            clearPin();
+            return;
+          default:
+            return;
+        }
+        event.preventDefault();
+        pinPlace(pin.lat, pin.lng);
       };
 
       // Pause rotation while hovering.
@@ -281,12 +451,21 @@ export default function Globe() {
       };
 
       renderer.domElement.addEventListener("click", onClick);
-      container.addEventListener("mouseenter", onEnter);
-      container.addEventListener("mouseleave", onLeave);
+      container.addEventListener("keydown", onKeyDown);
+      /* Hovering pauses the earth, but only where hovering exists: on a touch
+         screen the compatibility mouse event that follows a tap would otherwise
+         leave the globe stopped for good. */
+      if (window.matchMedia("(hover: hover)").matches) {
+        container.addEventListener("mouseenter", onEnter);
+        container.addEventListener("mouseleave", onLeave);
+        cleanupListeners.push(() => {
+          container.removeEventListener("mouseenter", onEnter);
+          container.removeEventListener("mouseleave", onLeave);
+        });
+      }
       cleanupListeners.push(() => {
         renderer.domElement.removeEventListener("click", onClick);
-        container.removeEventListener("mouseenter", onEnter);
-        container.removeEventListener("mouseleave", onLeave);
+        container.removeEventListener("keydown", onKeyDown);
       });
 
       const onResize = () => {
@@ -301,7 +480,15 @@ export default function Globe() {
       cleanupListeners.push(() => window.removeEventListener("resize", onResize));
     }
 
-    function runLoop(THREE: any, renderer: any, scene: any, camera: any, globe: any, marker: any) {
+    function runLoop(
+      THREE: any,
+      renderer: any,
+      scene: any,
+      camera: any,
+      globe: any,
+      marker: any,
+      pin: any
+    ) {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const speed = reduced ? 0 : 0.0035;
 
@@ -311,7 +498,7 @@ export default function Globe() {
             const group = new THREE.Group();
             const dot = new THREE.Mesh(
               new THREE.SphereGeometry(0.035, 16, 16),
-              new THREE.MeshBasicMaterial({ color: 0xff4d5e })
+              new THREE.MeshBasicMaterial({ color: YOU_COLOR })
             );
             group.add(dot);
             const glow = new THREE.Sprite(
@@ -330,7 +517,9 @@ export default function Globe() {
             globe.add(group);
             marker.glow = glow;
             marker.dot = dot;
-            reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+            self.lat = pos.coords.latitude;
+            self.lng = pos.coords.longitude;
+            nameVisitorPosition(self.lat, self.lng);
           },
           () => {},
           { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
@@ -339,12 +528,21 @@ export default function Globe() {
 
       const animate = () => {
         raf = requestAnimationFrame(animate);
-        if (!paused) globe.rotation.y += speed;
+        /* The earth holds still while a place is pinned: a touch screen has no
+           hover to pause it, and a spinning globe would carry the visitor's pin
+           out of sight. Hovering still pauses it too. */
+        if (!paused && pin.lat === null) globe.rotation.y += speed;
         if (marker.glow) {
           marker.t += 0.05;
           const s = 1 + 0.35 * Math.sin(marker.t);
           marker.glow.scale.set(0.28 * s, 0.28 * s, 1);
           marker.dot.scale.setScalar(1 + 0.4 * Math.sin(marker.t));
+        }
+        if (pin.halo?.visible) {
+          pin.t += 0.045;
+          const s = 1 + 0.3 * Math.sin(pin.t);
+          pin.halo.scale.set(0.26 * s, 0.26 * s, 1);
+          pin.head.scale.setScalar(1 + 0.22 * Math.sin(pin.t));
         }
         renderer.render(scene, camera);
       };
@@ -381,11 +579,42 @@ export default function Globe() {
   return (
     <div className="hero__visual">
       <div className="hero__orbit">
-        <div className="hero__globe" ref={containerRef} aria-hidden="true" />
+        <div
+          className="hero__globe"
+          ref={containerRef}
+          role="img"
+          tabIndex={0}
+          aria-label={t("globeA11y")}
+        />
       </div>
-      <p className="hero__loc" hidden={!label}>
-        {label ? `📍 ${label}` : ""}
-      </p>
+      {/* One reserved-height row: a hint, the visitor's own place, and the
+          place they pinned. */}
+      <div className="hero__readout">
+        {!explored && <p className="hero__hint">{t("globeHint")}</p>}
+        <p className="hero__loc" hidden={!label} title={t("globeYou")}>
+          {label ? `🧭 ${label}` : ""}
+        </p>
+        {place && (
+          <div className="hero__place" role="status" aria-live="polite">
+            <span className="hero__place-text">
+              <span className="hero__place-name">
+                {place.name ? `📍 ${place.name}` : t("globeLooking")}
+              </span>
+              {place.name !== place.coords && (
+                <span className="hero__place-coords">{place.coords}</span>
+              )}
+            </span>
+            <button
+              type="button"
+              className="hero__place-clear"
+              onClick={() => clearPinRef.current()}
+              aria-label={t("globeClear")}
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
