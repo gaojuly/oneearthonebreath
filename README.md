@@ -78,6 +78,14 @@ That is the only command needed. It builds the Worker bundle, deploys it, and th
 checks that <https://1e1b.org/> and <https://1e1b.org/zh-Hant> answer with the
 OpenNext Worker, so a broken deploy fails loudly instead of silently.
 
+From a clean checkout (no `.open-next/`), run the build first: OpenNext's deploy
+shim reads the compiled config before wrangler rebuilds it, so `npm run deploy` on
+its own fails with "Could not find compiled Open Next config".
+
+```bash
+npx opennextjs-cloudflare build && npm run deploy
+```
+
 ### Where production lives
 
 | | |
