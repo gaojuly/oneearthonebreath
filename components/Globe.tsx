@@ -2,16 +2,15 @@
 
 /* The hero earth.
  *
- * Where a Google Maps API key is configured (served by /api/maps-key) the hero
- * is Google's 3D Maps globe — photorealistic 3D tiles — and a tap flies the
- * camera down to that point and names it. Without a key, or if that globe fails
- * to load or draw, the stylised three.js earth takes over. Both report their
- * picks here, so the read-out, the geocoding and the clearing behave the same
- * either way. */
+ * Where a MapTiler API key is configured (served by /api/maps-key) the hero is
+ * MapTiler's satellite tiles on a globe, and a tap flies the camera down to that
+ * point and names it. Without a key, or if that globe fails to load or draw, the
+ * stylised three.js earth takes over. Both report their picks here, so the
+ * read-out, the geocoding and the clearing behave the same either way. */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import GoogleEarth from "./globe/GoogleEarth";
+import MapTiler from "./globe/MapTiler";
 import Readout, { type PinnedPlace } from "./globe/Readout";
 import StylisedGlobe from "./globe/Stylised";
 import { formatCoords, formatPlace, geocodeLanguage, lookupPlace } from "./globe/place";
@@ -24,8 +23,8 @@ export default function Globe() {
   const language = geocodeLanguage(locale);
 
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const [googleReady, setGoogleReady] = useState(false);
-  const [googleFailed, setGoogleFailed] = useState(false);
+  const [tilesReady, setTilesReady] = useState(false);
+  const [tilesFailed, setTilesFailed] = useState(false);
   const [you, setYou] = useState<string | null>(null);
   const [youAt, setYouAt] = useState<LatLng | null>(null);
   const [place, setPlace] = useState<PinnedPlace | null>(null);
@@ -38,9 +37,9 @@ export default function Globe() {
   const token = useRef(0);
   const cache = useRef(new Map<string, string>());
 
-  /* Which earth the hero shows: Google's while a key is configured and its
-     tiles have not failed. */
-  const google = !!apiKey && !googleFailed;
+  /* Which earth the hero shows: MapTiler's tiles while a key is configured and
+     they have not failed. */
+  const tiles = !!apiKey && !tilesFailed;
 
   /* The key is fetched at runtime, so one build works with or without it. */
   useEffect(() => {
@@ -112,9 +111,9 @@ export default function Globe() {
   /* Back to the whole earth, keeping the name. */
   const resetView = useCallback(() => setResetToken((n) => n + 1), []);
 
-  const onGoogleError = useCallback(() => {
-    setGoogleFailed(true);
-    setGoogleReady(false);
+  const onTilesError = useCallback(() => {
+    setTilesFailed(true);
+    setTilesReady(false);
   }, []);
 
   const stylised = (
@@ -130,17 +129,17 @@ export default function Globe() {
   return (
     <div className="hero__visual">
       <div className="hero__orbit">
-        {google ? (
+        {tiles ? (
           <>
-            {/* The tested stylised earth stands in until Google's tiles have
-                drawn a steady frame, and returns if the SDK fails. */}
-            {!googleReady && stylised}
-            <GoogleEarth
+            {/* The tested stylised earth stands in until the tiles have drawn a
+                frame, and returns if the key or the SDK fails. */}
+            {!tilesReady && stylised}
+            <MapTiler
               apiKey={apiKey}
               language={language}
               onPick={onPick}
-              onSteady={() => setGoogleReady(true)}
-              onError={onGoogleError}
+              onSteady={() => setTilesReady(true)}
+              onError={onTilesError}
               you={youAt}
               youLabel={t("globeYou")}
               pin={pinAt ? { ...pinAt, name: place?.name ?? null } : null}

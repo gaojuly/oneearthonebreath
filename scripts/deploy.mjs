@@ -91,6 +91,25 @@ Recreate ${ENV_FILE} with a token from that account (Workers Scripts:Edit).`);
 const passthrough = process.argv.slice(2);
 console.log(`\n▸ Deploying to ${PROD_URL} (account ${ACCOUNT_ID})\n`);
 
+/* The hero globe's browser key rides along in .env.deploy.local and is pushed as
+   a Worker secret first, so the key never has to be committed and a deploy is
+   all it takes to set or rotate it. Without it the hero simply keeps its
+   stylised earth, so a failure here is a warning, not a failed deploy. */
+const heroKey = fileEnv.MAPTILER_API_KEY || process.env.MAPTILER_API_KEY;
+if (heroKey && !passthrough.includes("--dry-run")) {
+  const put = spawnSync("npx", ["wrangler", "secret", "put", "MAPTILER_API_KEY"], {
+    cwd: ROOT,
+    input: `${heroKey}\n`,
+    stdio: ["pipe", "inherit", "inherit"],
+    env: { ...process.env, CLOUDFLARE_API_TOKEN: token, CLOUDFLARE_ACCOUNT_ID: ACCOUNT_ID },
+  });
+  console.log(
+    put.status === 0
+      ? "✔ MAPTILER_API_KEY secret set"
+      : "· MAPTILER_API_KEY was not set — the hero keeps its stylised earth"
+  );
+}
+
 const deploy = spawnSync("npx", ["wrangler", "deploy", ...passthrough], {
   cwd: ROOT,
   stdio: "inherit",

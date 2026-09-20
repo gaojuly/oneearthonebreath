@@ -8,7 +8,7 @@ A dynamic, high-performance web app for **One Earth One Breath** — a global mi
 
 - **7 pages** — Home, Vision, Science, Practice, Community, Support, Contact
 - **🌐 Internationalisation** — English + 繁體中文 (Traditional Chinese), with automatic locale detection by visitor country (see below)
-- **3D Earth globe** in the hero, with a visitor-location marker
+- **3D Earth globe** in the hero (MapTiler, globed satellite tiles), with a visitor-location marker
 - **Fully responsive** mobile-first layout, dark/light mode, animated counters & scroll-reveal
 - **Accessible** — semantic HTML, ARIA labels, keyboard focus, reduced-motion support
 - **Real PayPal donations** — Smart Donation Buttons on the Support page
@@ -134,54 +134,58 @@ Secrets (set once, kept out of the repo):
 ```bash
 CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CLIENT_ID
 CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_SECRET
-CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CURRENCY   # e.g. USD
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put PAYPAL_CURRENCY     # e.g. USD
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put MAPTILER_API_KEY    # hero globe (see below)
 ```
 
-## 🌍 Hero 3D globe (optional Google Maps key)
+`npm run deploy` sets `MAPTILER_API_KEY` for you when it is in `.env.deploy.local`
+(gitignored), so only the PayPal secrets need running by hand.
+
+## 🌍 Hero globe (optional MapTiler key)
 
 The home hero shows the **stylised earth** (three.js, `components/globe/Stylised.tsx`)
-out of the box. Set a Google Maps JavaScript API key and the same hero hosts
-**Google's 3D Maps globe** instead — photorealistic 3D tiles — where a tap flies
-the camera down to that point, drops a labelled marker and names the place in the
-read-out underneath.
+out of the box. Set a [MapTiler](https://www.maptiler.com/) key and the same hero
+hosts **MapTiler's satellite-hybrid tiles on a globe** instead
+(`components/globe/MapTiler.tsx`, MapTiler SDK JS in globe projection) — a tap
+flies the camera down to that point, drops a labelled marker and names the place
+in the read-out underneath.
 
 ```bash
-# Worker secret (production)
-CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put GOOGLE_MAPS_API_KEY
+# Worker secret (production) — `npm run deploy` sets this for you when the key
+# is in .env.deploy.local; or set it by hand:
+CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put MAPTILER_API_KEY
 
 # or a local override while developing (gitignored)
-echo 'GOOGLE_MAPS_API_KEY=AIza…' >> .env.local
+echo 'MAPTILER_API_KEY=…' >> .dev.vars
 ```
 
-Setup in Google Cloud:
+Setup in MapTiler Cloud (<https://cloud.maptiler.com/account/keys/>):
 
-1. Create/select a project with **billing enabled** (3D Maps is a paid SKU).
-2. Enable **Maps JavaScript API**.
-3. Create an API key and restrict it by **HTTP referrer** to `https://1e1b.org/*`
-   and `https://www.1e1b.org/*` (the key is necessarily public once the browser
-   loads the SDK — it is served by `app/api/maps-key/route.ts`, never committed).
-4. Optionally restrict it to the Maps JavaScript API.
+1. Create or open a key.
+2. Add the origins allowed to use it: **`https://1e1b.org`**,
+   **`https://www.1e1b.org`** and, for local work, **`http://localhost:3000`**.
+   A key with an origin restriction answers every other referrer with
+   `403 Key usage restricted`, and the hero then keeps its stylised earth — so
+   this is the step that makes the globe appear.
+3. Leave its services unrestricted, or at least allow **Maps/Tiles**.
 
 How it behaves, whatever the key does:
 
 - **No key** → the stylised earth, exactly as before.
-- **Key present** → the stylised earth stands in until Google's first steady
-  frame, then is unmounted, so the hero never shows an empty box while tiles
-  stream. Google's own controls and logo stay visible, as its terms require.
-- **Key invalid, unbilled or blocked, SDK error, tiles never draw** → the
-  component reports it and the stylised earth stays (verified by
-  `/tmp/globe_google_check.mjs`, which runs the hero with a deliberately invalid
-  key and asserts the fallback still names places; and by
-  `/tmp/globe_google_live.mjs`, which runs it with a real key and asserts that
-  either Google's globe draws and flies, or the fallback takes over cleanly).
+- **Key present** → the stylised earth stands in until MapTiler's first drawn
+  frame (`idle`), then is unmounted, so the hero never shows an empty box while
+  tiles stream.
+- **Key invalid, restricted to another origin, blocked, SDK error, or nothing
+  drawn inside a 12 s budget** → the component says so on the console and the
+  stylised earth stays.
 
-Verified against a real key with **billing off**: Google loads the SDK, the
-`Map3DElement` constructs, but no tiles are served, `gmp-click` never fires and
-its own panel reads "Oops! Something went wrong". That failure does not arrive as
-an element event — it is caught through `window.gm_authFailure` plus a
-steady-frame deadline, and the hero keeps the stylised earth instead. So the hero
-is safe to deploy before billing is enabled, and starts using Google's globe by
-itself once the project is billed.
+The SDK (`maptiler-sdk-js` v4.1.0, loaded from MapTiler's CDN) uses globe
+projection with the **hybrid** style, its label language follows the page
+(`en` / `zh-Hant`), and MapTiler's attribution and logo stay visible as its terms
+require. The SDK's `space` box and `halo` are off and the style's background
+layer is repainted transparent, so the hero's own light shows around the earth —
+no frame, exactly as with the stylised globe. Terrain can be switched on with
+`terrain: true` in the `Map` options if a 3D relief at street level is wanted.
 
 Both earths share the read-out, the reverse geocoding and the clear button
 (`components/Globe.tsx` orchestrates, `components/globe/` holds the pieces).
