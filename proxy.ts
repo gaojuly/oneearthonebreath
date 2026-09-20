@@ -4,6 +4,15 @@ import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
+/* A response that has to be rebuilt for every visitor, so the Worker's own cache
+   (the `cache` block in wrangler.jsonc, which serves a stored answer without
+   running this Worker) never pins one variant for everyone. A URL without a
+   locale prefix answers in the visitor's own language — the default page, or a
+   redirect to the prefixed one — and the cache key is the path, so English and
+   zh-Hant visitors would otherwise share one answer. Prefixed URLs are fixed
+   content by comparison, and stay cacheable. */
+const PER_VISITOR = "private, no-store, max-age=0, must-revalidate";
+
 // Region/country → locale. Extend this map when adding more languages.
 const countryToLocale: Record<string, string> = {
   TW: "zh-Hant", // Taiwan
@@ -32,13 +41,17 @@ export default function middleware(request: NextRequest) {
         path: "/",
         maxAge: 60 * 60 * 24 * 365,
       });
+      response.headers.set("Cache-Control", PER_VISITOR);
       return response;
     }
   }
 
-  return intlMiddleware(request);
+  const response = intlMiddleware(request);
+  if (!hasLocale) response.headers.set("Cache-Control", PER_VISITOR);
+  return response;
 }
 
 export const config = {
   matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };
+

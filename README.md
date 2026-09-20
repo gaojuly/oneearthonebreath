@@ -141,6 +141,34 @@ CLOUDFLARE_ACCOUNT_ID=04ac64317dea9158c772ec0c91465660 wrangler secret put MAPTI
 `npm run deploy` sets `MAPTILER_API_KEY` for you when it is in `.env.deploy.local`
 (gitignored), so only the PayPal secrets need running by hand.
 
+## ⚡ Worker resource limits (Error 1102)
+
+The site used to throw an occasional **Error 1102 — "Worker exceeded resource
+limits"** under bursts of concurrent requests (about 0.6% of requests; more when
+a crawler or a page-load fan-out of prefetches landed together). Each page view
+re-rendered on the Worker for 40–665 ms of CPU, so overlapping requests could
+push a single invocation past its limit and Cloudflare kills it.
+
+`wrangler.jsonc` therefore enables **Workers Cache** (`"cache": { "enabled": true }`),
+which makes Cloudflare answer a stored response **without running the Worker** —
+no CPU, so no limit to exceed, and a much faster first byte too. Cacheability is
+decided purely by each response's `Cache-Control`, and entries are keyed by path,
+entrypoint and **Worker version**, so a new deployment starts from a fresh cache
+and can never serve a previous version's HTML.
+
+- **Cacheable:** the prerendered pages (`s-maxage` from OpenNext) and
+  `/api/maps-key` (300 s).
+- **Never cached (`no-store`):** anything that has to be built per visitor — an
+  un-prefixed URL answering in the visitor's own language or redirecting to the
+  prefixed one (`proxy.ts` sets this, because the cache key is the path and
+  English/zh-Hant visitors would otherwise share one answer), `/community`'s
+  rolling hour, 404s and every POST.
+
+Still running on the Worker, by design: the un-prefixed English paths, and
+`/community`. Moving the country redirect to an edge Redirect Rule would let the
+un-prefixed paths be cached too; a WAF rate-limit rule would blunt crawler bursts
+on 404s. Both are zone-level settings, not part of this repo.
+
 ## 🌍 Hero globe (optional MapTiler key)
 
 The home hero shows the **stylised earth** (three.js, `components/globe/Stylised.tsx`)

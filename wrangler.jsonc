@@ -9,6 +9,17 @@
   // and the 1e1b.org / www.1e1b.org custom domains. Pinning the account here means
   // `wrangler deploy` (and therefore `npm run deploy` and Workers Builds) always
   // targets that account instead of any other account with the same Worker name.
+  // Workers Cache: Cloudflare checks this Worker's own cache before invoking it,
+  // so a stored answer costs no CPU time and cannot be terminated for exceeding
+  // a limit (Error 1102) — the intermittent failures this site was seeing under
+  // bursts of concurrent requests. What is cacheable is decided entirely by the
+  // `Cache-Control` each response carries (per RFC 9111): the prerendered pages
+  // send `s-maxage`, /api/maps-key sends 300s, and anything that has to be built
+  // per visitor — an un-prefixed URL answering in the visitor's own language
+  // (see proxy.ts), /community's rolling hour, 404s — sends `no-store`. Entries
+  // are keyed by path, entrypoint and Worker version, so a new deployment starts
+  // from a fresh cache and can never serve a previous version's HTML.
+  "cache": { "enabled": true },
   "account_id": "04ac64317dea9158c772ec0c91465660",
   // Workers Builds (CI) / `wrangler deploy` run this before deploying, so the
   // OpenNext worker bundle exists in .open-next/ even when only `wrangler deploy`
