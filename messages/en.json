@@ -12,6 +12,10 @@
       "title": "The Science — One Earth One Breath",
       "description": "The Multimodal Mindfulness Index (MMI), wavelet entropy, alpha and theta activity, and brain–heart coordination — the scientific foundations of One Earth One Breath."
     },
+    "research": {
+      "title": "Research & Publications — One Earth One Breath",
+      "description": "Peer-reviewed papers from One Earth One Breath and the lab behind it — breathing, meditation, compassion, and the neuroscience that measures them."
+    },
     "practice": {
       "title": "The Practice — One Earth One Breath",
       "description": "Ocean-guided breathing, five core mindfulness practices, and adaptive audio — the practice at the heart of One Earth One Breath."
@@ -36,6 +40,8 @@
     "science": "Science",
     "practice": "Practice",
     "community": "Community",
+    "resources": "Resources",
+    "researchPublications": "Research & Publications",
     "contact": "Contact",
     "support": "Support",
     "menu": "Open menu",
@@ -69,6 +75,7 @@
     "community": "Community",
     "support": "Support",
     "contact": "Contact",
+    "research": "Research & Publications",
     "learnMore": "Learn more"
   },
   "Home": {
@@ -194,6 +201,32 @@
     "ctaTitle": "Curious about the practice itself?",
     "ctaDesc": "Explore the five core practices and the ocean-guided breathing that anchor the experience.",
     "cta1": "Explore the practice"
+  },
+  "Research": {
+    "heroTitle": "Research & Publications",
+    "heroSub": "Peer-reviewed work from One Earth One Breath and the lab behind it — what breathing, meditation, and compassion do to the brain, and how we measure it.",
+    "introEyebrow": "Why we publish",
+    "introTitle": "Practice, put to the test",
+    "introLead": "Every claim on this site is meant to survive a reviewer. We work with colleagues at The University of Hong Kong — the Centre of Buddhist Studies and the Centre on Behavioral Health — and with EEG, heart-rate, and breathing data, to test what contemplative practice actually changes.",
+    "introP": "The papers below are the record: what was measured, in whom, and what it showed. Where a practice is not yet supported by evidence, we say so — the science page sets out how the measurements work.",
+    "introCta": "How the measurements work",
+    "listEyebrow": "Publications",
+    "listTitle": "Peer-reviewed papers",
+    "listDesc": "Grouped by year, newest first. Each title opens the paper itself.",
+    "doiLabel": "DOI",
+    "readPaper": "Read the paper",
+    "profileLead": "The full, always-current list lives at",
+    "joinEyebrow": "Take part",
+    "joinTitle": "Bring a study, a clinic, or a cohort",
+    "joinLead": "The research is only as good as the people in it. We are looking for partners who can host a study, share anonymised data, or help fund measurement rather than marketing.",
+    "joinPoints": [
+      "Researchers: joint studies, shared protocols, open data where consent allows",
+      "Clinicians and teachers: pilot the practices with the people you already serve",
+      "Funders: measurement and validation first — the part that rarely gets funded",
+      "Participants: join a study, or practise with the community in the meantime"
+    ],
+    "joinCta": "Get in touch",
+    "joinCta2": "Join the community"
   },
   "Practice": {
     "heroTitle": "The practice",

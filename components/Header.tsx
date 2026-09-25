@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import Logo from "./Logo";
 
-const NAV = [
+/* The primary menu. An entry with `children` is a group: its own heading is a
+   label rather than a link (the group has no page of its own), and the pages
+   under it hang from a dropdown — on a pointer, a tap, or a keyboard focus. */
+type NavLink = { href: string; label: string };
+type NavGroup = { label: string; children: NavLink[] };
+
+const NAV: (NavLink | NavGroup)[] = [
   { href: "/", label: "home" },
   { href: "/vision", label: "vision" },
   { href: "/science", label: "science" },
   { href: "/practice", label: "practice" },
   { href: "/community", label: "community" },
+  { label: "resources", children: [{ href: "/research", label: "researchPublications" }] },
   { href: "/contact", label: "contact" },
-] as const;
+];
+
+function isGroup(item: NavLink | NavGroup): item is NavGroup {
+  return "children" in item;
+}
 
 export default function Header() {
   const t = useTranslations("Nav");
@@ -20,6 +31,10 @@ export default function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  /* Which dropdown is open by tap or click: a pointer or a keyboard focus opens
+     one through CSS, this is what makes the same menu work on a touch screen. */
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -32,6 +47,16 @@ export default function Header() {
     document.body.classList.toggle("menu-open", open);
     return () => document.body.classList.remove("menu-open");
   }, [open]);
+
+  /* A tap anywhere else closes the open group. */
+  useEffect(() => {
+    if (!openGroup) return;
+    const onDocumentClick = (event: MouseEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpenGroup(null);
+    };
+    document.addEventListener("click", onDocumentClick);
+    return () => document.removeEventListener("click", onDocumentClick);
+  }, [openGroup]);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -51,17 +76,48 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className={`nav__links ${open ? "is-open" : ""}`} aria-label="Primary">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={isActive(item.href) ? "active" : ""}
-              onClick={() => setOpen(false)}
-            >
-              {t(item.label)}
-            </Link>
-          ))}
+        <nav ref={navRef} className={`nav__links ${open ? "is-open" : ""}`} aria-label="Primary">
+          {NAV.map((item) =>
+            isGroup(item) ? (
+              <div key={item.label} className={`nav__group ${openGroup === item.label ? "is-open" : ""}`}>
+                <button
+                  type="button"
+                  className={`nav__group-label ${item.children.some((child) => isActive(child.href)) ? "active" : ""}`}
+                  aria-expanded={openGroup === item.label}
+                  onClick={() => setOpenGroup((value) => (value === item.label ? null : item.label))}
+                >
+                  {t(item.label)}
+                  <svg className="nav__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div className="nav__submenu">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={isActive(child.href) ? "active" : ""}
+                      onClick={() => {
+                        setOpen(false);
+                        setOpenGroup(null);
+                      }}
+                    >
+                      {t(child.label)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isActive(item.href) ? "active" : ""}
+                onClick={() => setOpen(false)}
+              >
+                {t(item.label)}
+              </Link>
+            )
+          )}
         </nav>
 
         <div className="nav__actions">

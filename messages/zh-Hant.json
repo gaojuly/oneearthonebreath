@@ -12,6 +12,10 @@
       "title": "科學基礎 — One Earth One Breath",
       "description": "多模態正念指數（MMI）、小波熵、α 波與 θ 波活動，以及腦心協調——One Earth One Breath 的科學基礎。"
     },
+    "research": {
+      "title": "研究與出版 — One Earth One Breath",
+      "description": "一心一息及其背後實驗室的同儕評審論文——呼吸、冥想、慈悲，以及量度它們的神經科學。"
+    },
     "practice": {
       "title": "練習 — One Earth One Breath",
       "description": "以海洋引導的呼吸、五個核心正念練習與自適應音頻——One Earth One Breath 的核心練習。"
@@ -36,6 +40,8 @@
     "science": "科學",
     "practice": "練習",
     "community": "社群",
+    "resources": "資源",
+    "researchPublications": "研究與出版",
     "contact": "聯絡",
     "support": "支持",
     "menu": "開啟選單",
@@ -69,6 +75,7 @@
     "community": "社群",
     "support": "支持",
     "contact": "聯絡",
+    "research": "研究與出版",
     "learnMore": "了解更多"
   },
   "Home": {
@@ -194,6 +201,32 @@
     "ctaTitle": "對練習本身感到好奇嗎？",
     "ctaDesc": "探索支撐這體驗的五個核心練習，以及以海洋引導的呼吸。",
     "cta1": "探索練習"
+  },
+  "Research": {
+    "heroTitle": "研究與出版",
+    "heroSub": "一心一息及其背後實驗室的同儕評審研究——呼吸、冥想與慈悲為大腦帶來什麼改變，以及我們如何量度。",
+    "introEyebrow": "為何發表",
+    "introTitle": "把修習帶到檢驗之中",
+    "introLead": "本網站上的每一項主張，都要經得起評審。我們與香港大學的夥伴——佛學研究中心與行為健康中心——合作，以腦電、心率與呼吸數據，檢驗靜觀修習真正改變了什麼。",
+    "introP": "以下論文就是紀錄：量度了什麼、對象是誰、結果如何。尚未有證據支持的練習，我們會如實說明——量度的原理見科學基礎頁。",
+    "introCta": "了解量度方法",
+    "listEyebrow": "出版物",
+    "listTitle": "同儕評審論文",
+    "listDesc": "按年份排列，最新的在最前。點按標題即可開啟論文原文。",
+    "doiLabel": "DOI",
+    "readPaper": "閱讀論文",
+    "profileLead": "完整且持續更新的清單載於",
+    "joinEyebrow": "參與研究",
+    "joinTitle": "帶來一項研究、一間診所，或一群人",
+    "joinLead": "研究的質素，取決於參與其中的人。我們正在尋找能主持研究、提供匿名數據，或願意資助量度工作（而非市場推廣）的夥伴。",
+    "joinPoints": [
+      "研究者：共同研究、共用方案，在同意範圍內開放數據",
+      "臨床工作者與導師：在你現時服務的社群試行這些練習",
+      "資助者：先支持量度與驗證——最常缺乏資源的一環",
+      "參與者：加入研究，或先與社群一同練習"
+    ],
+    "joinCta": "聯絡我們",
+    "joinCta2": "加入社群"
   },
   "Practice": {
     "heroTitle": "練習",
