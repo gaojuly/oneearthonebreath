@@ -1152,10 +1152,19 @@ h1, h2, h3, h4, h5 {
 /* ---------- Page hero (subpages) ---------- */
 /* Every sub-page opens on the same photograph as the home hero, as a band
    behind the copy — the hero's world, without the earth. The gradient stays
-   underneath as the colour the picture settles onto while it loads. */
+   underneath as the colour the picture settles onto while it loads.
+   The band is a fixed 600px whatever copy a page puts in it, so the one-line
+   headers and the two-line ones open the page at the same height, and the copy
+   rides centred in the picture rather than sitting under the nav. The 160px of
+   top padding still keeps the breadcrumb clear of the fixed nav, and min-height
+   rather than height lets a page whose copy ever outruns the 350px left over
+   grow the band instead of spilling the type over the photograph. */
 .page-hero {
   background: var(--gradient-hero);
   color: #eafff3;
+  display: flex;
+  align-items: center;
+  min-height: 600px;
   padding: 160px 0 90px;
   position: relative;
   overflow: hidden;
