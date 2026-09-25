@@ -39,37 +39,9 @@ export default async function ResearchPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Why the lab publishes, and what a reader should expect of a claim. */}
-      <section className="section">
-        <div className="container split">
-          <div>
-            <span className="eyebrow reveal">{t("introEyebrow")}</span>
-            <h2 className="reveal">{t("introTitle")}</h2>
-            <p className="lead reveal">{t("introLead")}</p>
-            <p className="reveal" style={{ marginTop: 16 }}>{t("introP")}</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 28 }}>
-              <Link href="/science" className="btn btn--ghost btn--lg">{t("introCta")}</Link>
-            </div>
-          </div>
-          <div className="split__media reveal">
-            <div className="frame">
-              <svg viewBox="0 0 200 150" fill="none" aria-hidden="true">
-                <rect x="30" y="26" width="86" height="112" rx="8" fill="rgba(255,255,255,.9)" />
-                <rect x="42" y="42" width="62" height="6" rx="3" fill="#6366f1" opacity="0.75" />
-                <rect x="42" y="58" width="46" height="6" rx="3" fill="#0e7490" opacity="0.6" />
-                <rect x="42" y="74" width="56" height="6" rx="3" fill="#0e7490" opacity="0.6" />
-                <circle cx="150" cy="72" r="30" fill="rgba(255,255,255,.92)" />
-                <path d="M150 52 C143 60 139 65 139 71 C139 78 144 82 150 82 C156 82 161 78 161 71 C161 65 157 60 150 52 Z" fill="#6366f1" />
-                <path d="M96 92 C112 96 128 92 136 84" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* The list itself: year by year, each paper with its authors and venue. */}
       {grouped.length > 0 && (
-        <section className="section section--soft" id="publications">
+        <section className="section" id="publications">
           <div className="container">
             <div className="section-head">
               <span className="eyebrow reveal">{t("listEyebrow")}</span>
