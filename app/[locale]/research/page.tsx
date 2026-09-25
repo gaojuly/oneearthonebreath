@@ -43,12 +43,6 @@ export default async function ResearchPage({ params }: Props) {
       {grouped.length > 0 && (
         <section className="section" id="publications">
           <div className="container">
-            <div className="section-head">
-              <span className="eyebrow reveal">{t("listEyebrow")}</span>
-              <h2 className="reveal">{t("listTitle")}</h2>
-              <p className="reveal">{t("listDesc")}</p>
-            </div>
-
             {grouped.map(([year, papers]) => (
               <div className="pub-year" key={year}>
                 <h3 className="pub-year__label">{year}</h3>
