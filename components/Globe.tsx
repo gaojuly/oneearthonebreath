@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import MapTiler from "./globe/MapTiler";
 import Readout, { type PinnedPlace } from "./globe/Readout";
+import Constellation from "./globe/Constellation";
 import StylisedGlobe from "./globe/Stylised";
 import { formatCoords, formatPlace, geocodeLanguage, lookupPlace } from "./globe/place";
 
@@ -128,9 +129,13 @@ export default function Globe() {
 
   return (
     <>
-      {/* The earth itself, seated on the palm of the hero photograph (see
-          `.hero__palm` in globals.css for the geometry). */}
+      {/* The earth itself, held above the palm of the hero photograph (see
+          `.hero__palm` in globals.css for the geometry), with the visitor
+          constellation spreading out around it. */}
       <div className="hero__palm">
+        <div className="hero__network-map">
+          <Constellation />
+        </div>
         {tiles ? (
           <>
             {/* The tested stylised earth stands in until the tiles have drawn a

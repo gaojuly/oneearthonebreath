@@ -339,10 +339,10 @@ h1, h2, h3, h4, h5 {
 .hero__inner { position: relative; z-index: 1; display: block; }
 .hero__content { max-width: 560px; }
 /* Wider than 16:9 the photograph is scaled up by the viewport's height, so the
-   palm sits a little higher up the box than its own percentage; the earth
-   follows it. */
+   palm — and the earth above it — sit higher up the box than their own
+   percentages; at 21:9 that is five points. */
 @media (min-aspect-ratio: 21/9) {
-  .hero__palm { top: 55%; }
+  .hero__palm { top: 47%; }
 }
 
 
@@ -384,45 +384,107 @@ h1, h2, h3, h4, h5 {
 .hero__stat b { display: block; font-family: var(--font-heading); font-size: 1.7rem; color: #fff; line-height: 1; }
 .hero__stat span { font-size: 0.85rem; color: rgba(234, 255, 243, 0.75); }
 
-/* The earth, seated on her palm.
+/* The earth, held above her palm.
  *
  * Its size is tied to the picture, not to the viewport: `cover` scales the
- * photo by max(vw/1672, vh/941), so 200 source pixels of earth is exactly
- * max(11.96vw, 21.25vh) on screen — the diameter of her open palm. Its centre
- * sits 100 source pixels above the palm point (58% vs 69.6%), which is one
- * radius: the orb rests on the hand instead of floating over it. */
+ * photo by max(vw/1672, vh/941), so 280 source pixels of earth is exactly
+ * max(16.75vw, 29.76vh) on screen — the size the whole composition hangs on
+ * (the palm itself is 200). Its centre sits at 52% of the hero, which is 489
+ * pixels down the photograph: one radius above the palm at 655, so the earth
+ * hovers in her fingers with its glow spilling onto the hand. */
 .hero__palm {
   position: absolute;
   left: 55.6%;
-  top: 58%;
+  top: 52%;
   transform: translate(-50%, -50%);
-  width: min(max(11.96vw, 21.25vh), 300px);
+  width: min(max(16.75vw, 29.76vh), 420px);
   aspect-ratio: 1;
   z-index: 2;
 }
-/* Diffuse light behind the earth — no ring, outline or frame. */
+/* Diffuse light behind the earth — no ring, outline or frame. Warm, because the
+   visitor web around it is warm. */
 .hero__palm::before {
   content: "";
   position: absolute;
-  inset: -45%;
-  background: radial-gradient(circle at 50% 62%, rgba(96, 206, 245, 0.5) 0%, rgba(38, 146, 197, 0.26) 38%, rgba(10, 40, 80, 0) 72%);
+  inset: -55%;
+  background: radial-gradient(circle at 50% 62%, rgba(255, 214, 137, 0.42) 0%, rgba(120, 200, 240, 0.24) 42%, rgba(10, 40, 80, 0) 74%);
   pointer-events: none;
 }
-/* A soft contact shadow where the orb meets the hand, so it reads as resting in
-   the palm rather than pasted over it. */
+/* The pool of light the earth spills onto the hand below it — the glow reading
+   as a resting place without ever drawing a hard edge. */
 .hero__palm::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -3%;
-  width: 58%;
-  height: 12%;
+  bottom: 2%;
+  width: 54%;
+  height: 13%;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(46, 26, 10, 0.5) 0%, rgba(46, 26, 10, 0.2) 46%, rgba(46, 26, 10, 0) 100%);
+  background: radial-gradient(closest-side, rgba(255, 226, 168, 0.5) 0%, rgba(255, 200, 120, 0.2) 46%, rgba(255, 200, 120, 0) 100%);
   filter: blur(7px);
   pointer-events: none;
 }
+/* The visitor constellation: the spreading web of the reference artwork, drawn
+   at three times the earth's width so it reaches past the palm and runs off the
+   frame. It sits under the globe, so the earth's disc hides the middle of every
+   thread exactly as it does in the reference. */
+.hero__network-map {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300%;
+  height: 300%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  color: #ffd489;
+}
+.hero__constellation { display: block; width: 100%; height: 100%; overflow: visible; }
+.hero__net-sweep ellipse {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.45;
+  stroke-dasharray: 4 13;
+  animation: heroNetDrift 11s linear infinite;
+}
+.hero__net-thread { fill: none; stroke: currentColor; stroke-width: 1.5; opacity: 0.5; }
+/* The light travelling each thread: one short dash of the arc's own length,
+   normalised with pathLength so every thread takes the same time. */
+.hero__net-pulse {
+  fill: none;
+  stroke: #fff6de;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-dasharray: 26 974;
+  filter: drop-shadow(0 0 6px rgba(255, 214, 137, 0.9));
+  animation: heroNetTravel 3.4s linear infinite;
+}
+.hero__net-badge { color: #ffe6b8; animation: heroNetBreathe 6s ease-in-out infinite; }
+.hero__net-badge-ring { fill: rgba(30, 20, 8, 0.18); stroke: currentColor; stroke-width: 2.4; }
+.hero__net-halo { fill: none; stroke: currentColor; stroke-width: 1.3; opacity: 0.3; }
+@keyframes heroNetTravel {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes heroNetDrift {
+  to { stroke-dashoffset: -68; }
+}
+@keyframes heroNetBreathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+/* Nothing travels and nothing breathes when the visitor has asked for less
+   motion; the web itself stays. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__net-sweep ellipse,
+  .hero__net-pulse { animation: none; }
+  .hero__net-pulse { opacity: 0.3; }
+  .hero__net-badge { animation: none; opacity: 0.92; }
+}
+.hero__globe { position: absolute; inset: 0; cursor: pointer; z-index: 1; }
+
 /* The read-out: the visitor's own place, a pinned one, the invitation to tap,
    and the line that says what the network on the earth is showing. It keeps a
    fixed-height row so the earth never shifts under the finger that just tapped
