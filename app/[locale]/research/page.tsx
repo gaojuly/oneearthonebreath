@@ -86,44 +86,6 @@ export default async function ResearchPage({ params }: Props) {
         </section>
       )}
 
-      {/* How to take part in the work behind the list. */}
-      <section className="section section--soft">
-        <div className="container split">
-          <div>
-            <span className="eyebrow reveal">{t("joinEyebrow")}</span>
-            <h2 className="reveal">{t("joinTitle")}</h2>
-            <p className="lead reveal">{t("joinLead")}</p>
-            <ul className="checklist reveal">
-              {(t.raw("joinPoints") as string[]).map((item) => (
-                <li key={item}>
-                  <span className="checklist__mark">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 30 }}>
-              <Link href="/contact" className="btn btn--accent btn--lg">{t("joinCta")}</Link>
-              <Link href="/community" className="btn btn--ghost btn--lg">{t("joinCta2")}</Link>
-            </div>
-          </div>
-          <div className="split__media reveal">
-            <div className="frame">
-              <svg viewBox="0 0 200 150" fill="none" aria-hidden="true">
-                <circle cx="66" cy="62" r="26" fill="rgba(255,255,255,.92)" />
-                <circle cx="134" cy="62" r="26" fill="rgba(255,255,255,.86)" />
-                <circle cx="100" cy="104" r="22" fill="rgba(255,255,255,.8)" />
-                <path d="M66 62 L134 62 M66 62 L100 104 M134 62 L100 104" stroke="#6366f1" strokeWidth="2.4" strokeLinecap="round" />
-                <circle cx="66" cy="62" r="7" fill="#0e7490" />
-                <circle cx="134" cy="62" r="7" fill="#0e7490" />
-                <circle cx="100" cy="104" r="7" fill="#f59e0b" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </main>
   );
 }
