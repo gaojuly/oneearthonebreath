@@ -358,12 +358,10 @@ h1, h2, h3, h4, h5 {
 .nav__toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Hero ---------- */
-/* The hero is the photograph itself: a visitor in the room where the practice
-   happens, the drone they fly in front of her, and the live earth floating
-   above it with the visitor web spreading out around it. A percentage
-   `background-position` pins a given point of the picture to the same fraction
-   of the box, however `cover` crops it, so the earth keeps its place over the
-   drone at every viewport. */
+/* The hero is the photograph itself: the woman offering an open palm, with the
+   live earth resting in it. A percentage `background-position` pins exactly that
+   point of the picture to the same fraction of the box, however `cover` crops
+   it — so the globe (also 55.6% across) stays on the hand at every viewport. */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -380,28 +378,14 @@ h1, h2, h3, h4, h5 {
   inset: 0;
   z-index: -1;
   background-color: #061c2b;
-}
-/* The photograph, mirrored: in the file the woman sits on the left, which is
-   where the copy and the navy scrim go, so the layer is flipped and the frame
-   reads as this hero has always read — copy left, the lit figure right. It is a
-   pseudo-element because a background image cannot be transformed. */
-.hero__scene::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: url("/images/udrone.png");
+  background-image: url("/images/background-hero.png");
   background-size: cover;
-  /* The drone's own point in the file — 818 × 632 of the 1684 × 934 picture —
-     pinned to the same fraction of the box: the mirror then hangs it at 51.4%
-     across, which is the figure `.hero__palm` is measured against. */
-  background-position: 48.6% 67.7%;
+  /* 929 × 655 of the 1672 × 941 picture: the middle of her open palm. */
+  background-position: 55.6% 69.6%;
   background-repeat: no-repeat;
-  transform: scaleX(-1);
 }
 /* The copy keeps the calm left of the room: a navy scrim carries the type over
-   the wall and the plant in shadow, and a soft one along the bottom holds the
-   read-out. */
+   the sunrise, and a soft one along the bottom holds the read-out. */
 .hero__scene::after {
   content: "";
   position: absolute;
@@ -416,15 +400,11 @@ h1, h2, h3, h4, h5 {
    responsive block). */
 .hero__inner { position: relative; z-index: 1; display: block; }
 .hero__content { max-width: 560px; }
-/* Wider than the picture's own 1.80 the photograph starts being scaled up by the
-   viewport's width instead of its height, so the drone — and the earth above it —
-   sit higher up the box than their own fractions of it. These are the numbers
-   that hold the earth one radius clear of the drone at 2:1, 21:9 and beyond. */
-@media (min-aspect-ratio: 2/1) {
-  .hero__palm { top: 37.8%; }
-}
+/* Wider than 16:9 the photograph is scaled up by the viewport's height, so the
+   palm — and the earth above it — sit higher up the box than their own
+   percentages; at 21:9 that is five points. */
 @media (min-aspect-ratio: 21/9) {
-  .hero__palm { top: 32.6%; }
+  .hero__palm { top: 47%; }
 }
 
 
@@ -466,34 +446,45 @@ h1, h2, h3, h4, h5 {
 .hero__stat b { display: block; font-family: var(--font-heading); font-size: 1.7rem; color: #fff; line-height: 1; }
 .hero__stat span { font-size: 0.85rem; color: rgba(234, 255, 243, 0.75); }
 
-/* The earth, floating above the drone she is flying and her cupped hands.
+/* The earth, held above her palm.
  *
  * Its size is tied to the picture, not to the viewport: `cover` scales the
- * photo by max(vw/1684, vh/934), so 280 source pixels of earth is exactly
- * max(16.63vw, 29.98vh) on screen — the size the whole composition hangs on.
- * Its centre is one radius above the drone's own point in the file: the drone
- * runs 818-1022 × 557-707, so a centre at 51.4% / 40.7% holds the earth's feet
- * some 40 source pixels clear of the propellers, with the visitor web reaching
- * down either side of it. The aspect-ratio rules above lift it whenever `cover`
- * begins scaling by the viewport's width instead. */
+ * photo by max(vw/1672, vh/941), so 280 source pixels of earth is exactly
+ * max(16.75vw, 29.76vh) on screen — the size the whole composition hangs on
+ * (the palm itself is 200). Its centre sits at 52% of the hero, which is 489
+ * pixels down the photograph: one radius above the palm at 655, so the earth
+ * hovers in her fingers with its glow spilling onto the hand. */
 .hero__palm {
   position: absolute;
-  left: 51.4%;
-  top: 40.7%;
+  left: 55.6%;
+  top: 52%;
   transform: translate(-50%, -50%);
-  width: min(max(16.63vw, 29.98vh), 420px);
+  width: min(max(16.75vw, 29.76vh), 420px);
   aspect-ratio: 1;
   z-index: 2;
 }
-/* The shaded pool the web is drawn in — no ring, outline or frame. Navy now
-   rather than the warm glow it was over the old picture: this room is bright
-   and the visitor web is drawn in gold, so the earth needs some shade to sit in
-   for those threads to read at all. */
+/* Diffuse light behind the earth — no ring, outline or frame. Warm, because the
+   visitor web around it is warm. */
 .hero__palm::before {
   content: "";
   position: absolute;
   inset: -55%;
-  background: radial-gradient(circle at 50% 58%, rgba(4, 24, 44, 0.62) 0%, rgba(6, 30, 54, 0.34) 42%, rgba(10, 40, 80, 0) 74%);
+  background: radial-gradient(circle at 50% 62%, rgba(255, 214, 137, 0.42) 0%, rgba(120, 200, 240, 0.24) 42%, rgba(10, 40, 80, 0) 74%);
+  pointer-events: none;
+}
+/* The pool of light the earth spills onto the hand below it — the glow reading
+   as a resting place without ever drawing a hard edge. */
+.hero__palm::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 54%;
+  height: 13%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 226, 168, 0.5) 0%, rgba(255, 200, 120, 0.2) 46%, rgba(255, 200, 120, 0) 100%);
+  filter: blur(7px);
   pointer-events: none;
 }
 /* The visitor constellation: the spreading web of the reference artwork, drawn
@@ -1150,9 +1141,9 @@ h1, h2, h3, h4, h5 {
 }
 
 /* ---------- Page hero (subpages) ---------- */
-/* Every sub-page opens on the same photograph as the home hero, as a band
-   behind the copy — the hero's world, without the earth. The gradient stays
-   underneath as the colour the picture settles onto while it loads.
+/* Every sub-page opens on udrone.png — the visitor in the room with the drone
+   she is flying — as a band behind the copy. The gradient stays underneath as
+   the colour the picture settles onto while it loads.
    The band is a fixed 600px whatever copy a page puts in it, so the one-line
    headers and the two-line ones open the page at the same height, and the copy
    rides centred in the picture rather than sitting under the nav. The 160px of
@@ -1176,8 +1167,8 @@ h1, h2, h3, h4, h5 {
 .page-hero p { color: rgba(234, 255, 243, 0.85); font-size: 1.28rem; max-width: 640px; }
 .page-hero .breadcrumb { display: flex; gap: 8px; font-size: 0.85rem; color: rgba(234, 255, 243, 0.7); margin-bottom: 18px; }
 .page-hero .breadcrumb a { color: #a7f3d0; }
-/* The photograph, mirrored exactly as it is on the home page, so the woman and
-   the sofa sit to the right of the copy. */
+/* The photograph, mirrored: in the file the woman and the sofa sit on the left,
+   which is where the copy and the navy scrim go. */
 .page-hero::before {
   content: "";
   position: absolute;
@@ -1237,9 +1228,6 @@ h1, h2, h3, h4, h5 {
   .hero__scene::after {
     background: linear-gradient(0deg, rgba(3, 16, 27, 0.9) 0%, rgba(3, 16, 27, 0) 44%);
   }
-  /* The band is shorter than the picture's own ratio too, and the earth does not
-     shrink with it, so it lifts to stay clear of the drone above the hands. */
-  .hero__palm { top: 33%; }
   .hero__readout { bottom: 12px; min-height: 0; }
   .hero__content { max-width: 720px; }
   .cta-banner { grid-template-columns: 1fr; padding: 44px; }
