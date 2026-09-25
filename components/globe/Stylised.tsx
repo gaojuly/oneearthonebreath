@@ -7,6 +7,12 @@
    is reported to the parent, which holds the read-out. */
 
 import { useEffect, useRef } from "react";
+import {
+  VISITOR_CITIES,
+  networkLinks,
+  slerp,
+  toVector,
+} from "./visitors";
 
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
 const TEXTURE_URL = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg";
@@ -72,6 +78,22 @@ function makeNodeTexture(THREE: any) {
   return new THREE.CanvasTexture(c);
 }
 
+/* A soft radial glow, used for the visitor's own dot, the pin's halo and the
+   pulses travelling the visitor network. */
+function makeGlowTexture(THREE: any, rgb: readonly [number, number, number] = YOU_GLOW) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  const [red, green, blue] = rgb;
+  g.addColorStop(0, "rgba(255,255,255,0.95)");
+  g.addColorStop(0.3, `rgba(${red},${green},${blue},0.9)`);
+  g.addColorStop(1, `rgba(${red},${green},${blue},0)`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+
 /* Nodes joined by short links, wrapped around the sphere like the reference mesh. */
 function addNetwork(THREE: any, globe: any) {
   const r = 1.018;
@@ -127,6 +149,98 @@ function addNetwork(THREE: any, globe: any) {
       })
     )
   );
+}
+
+/* Visitor network palette: the mesh's own ice blue, with a brighter node and
+   pulse, so the cities read as people rather than geometry. */
+const CITY_COLOR = 0xa9ddff;
+const PULSE_GLOW = [168, 226, 255] as const;
+const LINK_RADIUS = 1.012;
+const LINK_ALTITUDE = 0.055;
+const LINK_STEPS = 64;
+const PULSE_TRAVEL_MS = 5200;
+
+/* The visitor network: the ring of cities in `visitors.ts`, the great-circle
+   links between neighbouring ones, and a pulse travelling each link — visitors
+   around the world, joined in one breath. Returns a tick for the render loop. */
+function addVisitorNetwork(THREE: any, globe: any) {
+  const links = networkLinks();
+  const group = new THREE.Group();
+  globe.add(group);
+
+  const arcMaterial = new THREE.LineBasicMaterial({
+    color: NET_COLOR,
+    transparent: true,
+    opacity: 0.4,
+    depthWrite: false,
+  });
+
+  const routes = links.map((link) => {
+    const a = toVector(link.from.lat, link.from.lng);
+    const b = toVector(link.to.lat, link.to.lng);
+    const points: any[] = [];
+    for (let i = 0; i <= LINK_STEPS; i++) {
+      const t = i / LINK_STEPS;
+      const v = slerp(a, b, t);
+      /* Lifted off the surface, so a link reads as something travelling over
+         the planet rather than drawn onto it. */
+      const r = LINK_RADIUS + LINK_ALTITUDE * Math.sin(Math.PI * t);
+      points.push(new THREE.Vector3(v[0] * r, v[1] * r, v[2] * r));
+    }
+    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), arcMaterial));
+    return points;
+  });
+
+  /* A soft dot at every city: where the visitors are. */
+  const cityPoints: number[] = [];
+  for (const city of VISITOR_CITIES) {
+    const v = toVector(city.lat, city.lng);
+    cityPoints.push(v[0] * LINK_RADIUS, v[1] * LINK_RADIUS, v[2] * LINK_RADIUS);
+  }
+  const cityGeo = new THREE.BufferGeometry();
+  cityGeo.setAttribute("position", new THREE.Float32BufferAttribute(cityPoints, 3));
+  group.add(
+    new THREE.Points(
+      cityGeo,
+      new THREE.PointsMaterial({
+        map: makeNodeTexture(THREE),
+        color: CITY_COLOR,
+        size: 0.036,
+        transparent: true,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+    )
+  );
+
+  /* One travelling glow per link, each with its own head start, so the network
+     twinkles continuously instead of pulsing in unison. */
+  const pulses = routes.map((points, index) => {
+    const sprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: makeGlowTexture(THREE, PULSE_GLOW),
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+      })
+    );
+    sprite.scale.set(0.07, 0.07, 1);
+    group.add(sprite);
+    return { sprite, points, offset: index / routes.length };
+  });
+
+  return function tick(now: number) {
+    for (const pulse of pulses) {
+      const t = (now / PULSE_TRAVEL_MS + pulse.offset) % 1;
+      const index = Math.min(
+        pulse.points.length - 1,
+        Math.max(0, Math.round(t * (pulse.points.length - 1)))
+      );
+      pulse.sprite.position.copy(pulse.points[index]);
+      /* Fades at both ends: a pulse leaves one city and arrives at the next. */
+      pulse.sprite.material.opacity = 0.2 + 0.8 * Math.sin(Math.PI * t);
+    }
+  };
 }
 
 type StylisedGlobeProps = {
@@ -199,20 +313,6 @@ export default function StylisedGlobe({
       const lngDeg = theta - 180;
       const lng = lngDeg < -180 ? lngDeg + 360 : lngDeg;
       return { lat, lng };
-    }
-
-    function makeGlowTexture(THREE: any, rgb: readonly [number, number, number] = YOU_GLOW) {
-      const c = document.createElement("canvas");
-      c.width = c.height = 64;
-      const ctx = c.getContext("2d")!;
-      const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      const [red, green, blue] = rgb;
-      g.addColorStop(0, "rgba(255,255,255,0.95)");
-      g.addColorStop(0.3, `rgba(${red},${green},${blue},0.9)`);
-      g.addColorStop(1, `rgba(${red},${green},${blue},0)`);
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, 64, 64);
-      return new THREE.CanvasTexture(c);
     }
 
     function start(THREE: any) {
@@ -318,6 +418,8 @@ export default function StylisedGlobe({
       clearPinRef.current = clearPin;
 
       addNetwork(THREE, globe);
+      /* The visitors: cities, the links between them, and a pulse per link. */
+      const visitors = addVisitorNetwork(THREE, globe);
 
       const loader = new THREE.TextureLoader();
       loader.setCrossOrigin("anonymous");
@@ -339,7 +441,7 @@ export default function StylisedGlobe({
             new THREE.MeshLambertMaterial({ map })
           );
           globe.add(sphereMesh);
-          runLoop(THREE, renderer, scene, camera, globe, marker, pin);
+          runLoop(THREE, renderer, scene, camera, globe, marker, pin, visitors);
         },
         undefined,
         () => {
@@ -348,7 +450,7 @@ export default function StylisedGlobe({
             new THREE.MeshLambertMaterial({ color: (OCEAN[0] << 16) | (OCEAN[1] << 8) | OCEAN[2] })
           );
           globe.add(sphereMesh);
-          runLoop(THREE, renderer, scene, camera, globe, marker, pin);
+          runLoop(THREE, renderer, scene, camera, globe, marker, pin, visitors);
         }
       );
       /* Click or tap anywhere on the earth: the ray that hits the sphere gives
@@ -448,7 +550,8 @@ export default function StylisedGlobe({
       camera: any,
       globe: any,
       marker: any,
-      pin: any
+      pin: any,
+      visitors: (now: number) => void
     ) {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const speed = reduced ? 0 : 0.0035;
@@ -487,7 +590,7 @@ export default function StylisedGlobe({
         );
       }
 
-      const animate = () => {
+      const animate = (now: number) => {
         raf = requestAnimationFrame(animate);
         /* The earth holds still while a place is pinned: a touch screen has no
            hover to pause it, and a spinning globe would carry the visitor's pin
@@ -505,9 +608,12 @@ export default function StylisedGlobe({
           pin.halo.scale.set(0.26 * s, 0.26 * s, 1);
           pin.head.scale.setScalar(1 + 0.22 * Math.sin(pin.t));
         }
+        /* The visitor network's pulses: skipped entirely when the visitor has
+           asked for less motion. */
+        if (!reduced) visitors(now);
         renderer.render(scene, camera);
       };
-      animate();
+      animate(performance.now());
     }
 
     function loadThree(cb: () => void) {

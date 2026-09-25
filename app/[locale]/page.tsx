@@ -32,27 +32,24 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <main>
-      {/* Hero */}
+      {/* Hero — the photograph of the open palm, with the live earth resting on
+          it and the visitor network drawn across the earth. */}
       <section className="hero" id="home">
-        <div className="hero__glow hero__glow--1"></div>
-        <div className="hero__glow hero__glow--2"></div>
-        <div className="hero__glow hero__glow--3"></div>
-        <div className="container">
-          <div className="hero__inner">
-            <div className="hero__content">
-              <h1>
-                {t("heroLine1")}
-                <br />
-                {t("heroLine2")}
-              </h1>
-              <p className="hero__sub">{t("heroSub")}</p>
-              <div className="hero__cta">
-                <Link href="/practice" className="btn btn--accent btn--lg">{t("heroCta1")}</Link>
-                <Link href="/vision" className="btn btn--ghost btn--lg" style={{ color: "#fff", borderColor: "rgba(255,255,255,.4)" }}>{t("heroCta2")}</Link>
-              </div>
+        <div className="hero__scene">
+          <Globe />
+        </div>
+        <div className="container hero__inner">
+          <div className="hero__content">
+            <h1>
+              {t("heroLine1")}
+              <br />
+              {t("heroLine2")}
+            </h1>
+            <p className="hero__sub">{t("heroSub")}</p>
+            <div className="hero__cta">
+              <Link href="/practice" className="btn btn--accent btn--lg">{t("heroCta1")}</Link>
+              <Link href="/vision" className="btn btn--ghost btn--lg" style={{ color: "#fff", borderColor: "rgba(255,255,255,.4)" }}>{t("heroCta2")}</Link>
             </div>
-
-            <Globe />
           </div>
         </div>
       </section>

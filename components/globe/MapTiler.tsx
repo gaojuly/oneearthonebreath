@@ -10,6 +10,12 @@
  * same way the stylised globe treats three.js. */
 
 import { useEffect, useRef, useState } from "react";
+import {
+  VISITOR_CITIES,
+  linkCoordinates,
+  networkLinks,
+  pointAlong,
+} from "./visitors";
 
 const SDK_JS = "https://cdn.maptiler.com/maptiler-sdk-js/v4.1.0/maptiler-sdk.umd.min.js";
 const SDK_CSS = "https://cdn.maptiler.com/maptiler-sdk-js/v4.1.0/maptiler-sdk.css";
@@ -109,6 +115,94 @@ function loadSdk(): Promise<any> {
   return w.__heroMaptiler;
 }
 
+/* The visitor network, as layers over the globe: the same cities and links the
+   stylised earth draws with three.js, so the hero tells one story whichever
+   earth it is showing. The arcs are still; the pulses travelling them and the
+   city dots are what move. Returns a tick for the render loop. */
+const PULSE_TRAVEL_MS = 5200;
+
+function addVisitorNetwork(map: any) {
+  const links = networkLinks();
+
+  map.addSource("visitor-arcs", {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: links.map((link) => ({
+        type: "Feature",
+        properties: {},
+        geometry: { type: "LineString", coordinates: linkCoordinates(link, 64) },
+      })),
+    },
+  });
+  map.addLayer({
+    id: "visitor-arcs",
+    type: "line",
+    source: "visitor-arcs",
+    paint: { "line-color": "#bcd9ff", "line-width": 0.9, "line-opacity": 0.4 },
+  });
+
+  map.addSource("visitor-cities", {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: VISITOR_CITIES.map((city) => ({
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Point", coordinates: [city.lng, city.lat] },
+      })),
+    },
+  });
+  map.addLayer({
+    id: "visitor-cities",
+    type: "circle",
+    source: "visitor-cities",
+    paint: {
+      "circle-color": "#a9ddff",
+      "circle-blur": 0.5,
+      "circle-radius": 3.2,
+      "circle-opacity": 0.9,
+    },
+  });
+
+  map.addSource("visitor-pulses", {
+    type: "geojson",
+    data: { type: "FeatureCollection", features: [] },
+  });
+  map.addLayer({
+    id: "visitor-pulses",
+    type: "circle",
+    source: "visitor-pulses",
+    paint: {
+      "circle-color": "#ffffff",
+      "circle-blur": 0.7,
+      "circle-radius": 3,
+      "circle-opacity": 0.95,
+    },
+  });
+
+  return function tick(now: number) {
+    const features = links.map((link, index) => {
+      /* Each pulse has its own head start, so the network twinkles continuously
+         instead of pulsing in unison. */
+      const t = (now / PULSE_TRAVEL_MS + index / links.length) % 1;
+      const [lng, lat] = pointAlong(link, t);
+      return {
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Point", coordinates: [lng, lat] },
+      };
+    });
+    map.getSource("visitor-pulses")?.setData({ type: "FeatureCollection", features });
+    /* The cities breathe in time with the traffic between them. */
+    map.setPaintProperty(
+      "visitor-cities",
+      "circle-radius",
+      3.2 * (1 + 0.3 * Math.sin(now / 900))
+    );
+  };
+}
+
 export default function MapTiler({
   apiKey,
   language,
@@ -144,6 +238,9 @@ export default function MapTiler({
     let steady = false;
     let steadyTimer = 0;
     let graceTimer = 0;
+    /* The visitor network's render loop, started with the style. */
+    let networkRaf = 0;
+    let networkTick: ((now: number) => void) | null = null;
 
     const fail = (reason: unknown, always = false) => {
       if (cancelled || (steady && !always)) return;
@@ -236,6 +333,22 @@ export default function MapTiler({
           } catch {
             /* A style we cannot repaint is not worth failing the hero over. */
           }
+          /* The visitor network goes on with the style: the cities, the links
+             between them, and a pulse travelling each link. Pulse travel is
+             motion, so with reduced motion the network goes on still. */
+          try {
+            networkTick = addVisitorNetwork(map);
+            if (!prefersReducedMotion()) {
+              const loop = (now: number) => {
+                networkRaf = window.requestAnimationFrame(loop);
+                networkTick?.(now);
+              };
+              networkRaf = window.requestAnimationFrame(loop);
+            }
+          } catch {
+            /* A style that will not take the layers is not worth failing the
+               hero over either. */
+          }
         });
         map.on("idle", settle);
         map.once("load", onLoaded);
@@ -257,6 +370,7 @@ export default function MapTiler({
       cancelled = true;
       window.clearTimeout(steadyTimer);
       window.clearTimeout(graceTimer);
+      window.cancelAnimationFrame(networkRaf);
       const map = mapRef.current;
       if (map) {
         map.off("idle", settle);

@@ -127,8 +127,10 @@ export default function Globe() {
   );
 
   return (
-    <div className="hero__visual">
-      <div className="hero__orbit">
+    <>
+      {/* The earth itself, seated on the palm of the hero photograph (see
+          `.hero__palm` in globals.css for the geometry). */}
+      <div className="hero__palm">
         {tiles ? (
           <>
             {/* The tested stylised earth stands in until the tiles have drawn a
@@ -154,6 +156,6 @@ export default function Globe() {
         )}
       </div>
       <Readout you={you} place={place} showHint={!explored} onClear={clear} />
-    </div>
+    </>
   );
 }

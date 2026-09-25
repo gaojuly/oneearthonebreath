@@ -296,35 +296,55 @@ h1, h2, h3, h4, h5 {
 .nav__toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Hero ---------- */
+/* The hero is the photograph itself: the woman offering an open palm, with the
+   live earth resting in it. A percentage `background-position` pins exactly that
+   point of the picture to the same fraction of the box, however `cover` crops
+   it — so the globe (also 55.6% across) stays on the hand at every viewport. */
 .hero {
   position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 140px 0 90px;
+  padding: 140px 0 120px;
   color: #eafff3;
-  background: var(--gradient-hero);
+  background: #061c2b;
   overflow: hidden;
   isolation: isolate;
 }
-.hero__glow {
+.hero__scene {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.55;
+  inset: 0;
   z-index: -1;
-  pointer-events: none;
+  background-color: #061c2b;
+  background-image: url("/images/background-hero.png");
+  background-size: cover;
+  /* 929 × 655 of the 1672 × 941 picture: the middle of her open palm. */
+  background-position: 55.6% 69.6%;
+  background-repeat: no-repeat;
 }
-.hero__glow--1 { width: 480px; height: 480px; background: #6366f1; top: -120px; right: -80px; }
-.hero__glow--2 { width: 420px; height: 420px; background: #0ea5e9; bottom: -140px; left: -60px; }
-.hero__glow--3 { width: 300px; height: 300px; background: #f59e0b; bottom: 40px; right: 18%; opacity: 0.3; }
+/* The copy keeps the calm left of the room: a navy scrim carries the type over
+   the sunrise, and a soft one along the bottom holds the read-out. */
+.hero__scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(100deg, rgba(3, 18, 30, 0.94) 0%, rgba(3, 18, 30, 0.78) 34%, rgba(3, 18, 30, 0.3) 54%, rgba(3, 18, 30, 0) 70%),
+    linear-gradient(0deg, rgba(3, 16, 27, 0.88) 0%, rgba(3, 16, 27, 0) 30%);
+}
 
-.hero__inner {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 48px;
-  align-items: center;
+/* The copy sits over the scene on wide screens and below it on phones (see the
+   responsive block). */
+.hero__inner { position: relative; z-index: 1; display: block; }
+.hero__content { max-width: 560px; }
+/* Wider than 16:9 the photograph is scaled up by the viewport's height, so the
+   palm sits a little higher up the box than its own percentage; the earth
+   follows it. */
+@media (min-aspect-ratio: 21/9) {
+  .hero__palm { top: 55%; }
 }
+
 
 .hero__badge {
   display: inline-flex;
@@ -364,39 +384,87 @@ h1, h2, h3, h4, h5 {
 .hero__stat b { display: block; font-family: var(--font-heading); font-size: 1.7rem; color: #fff; line-height: 1; }
 .hero__stat span { font-size: 0.85rem; color: rgba(234, 255, 243, 0.75); }
 
-.hero__visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-/* The read-out sits in a fixed-height row: the hint, the visitor's own place
-   and a pinned place come and go without the earth shifting under the finger
-   that just tapped it. */
+/* The earth, seated on her palm.
+ *
+ * Its size is tied to the picture, not to the viewport: `cover` scales the
+ * photo by max(vw/1672, vh/941), so 200 source pixels of earth is exactly
+ * max(11.96vw, 21.25vh) on screen — the diameter of her open palm. Its centre
+ * sits 100 source pixels above the palm point (58% vs 69.6%), which is one
+ * radius: the orb rests on the hand instead of floating over it. */
+.hero__palm {
+  position: absolute;
+  left: 55.6%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  width: min(max(11.96vw, 21.25vh), 300px);
+  aspect-ratio: 1;
+  z-index: 2;
+}
+/* Diffuse light behind the earth — no ring, outline or frame. */
+.hero__palm::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: radial-gradient(circle at 50% 62%, rgba(96, 206, 245, 0.5) 0%, rgba(38, 146, 197, 0.26) 38%, rgba(10, 40, 80, 0) 72%);
+  pointer-events: none;
+}
+/* A soft contact shadow where the orb meets the hand, so it reads as resting in
+   the palm rather than pasted over it. */
+.hero__palm::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3%;
+  width: 58%;
+  height: 12%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(46, 26, 10, 0.5) 0%, rgba(46, 26, 10, 0.2) 46%, rgba(46, 26, 10, 0) 100%);
+  filter: blur(7px);
+  pointer-events: none;
+}
+/* The read-out: the visitor's own place, a pinned one, the invitation to tap,
+   and the line that says what the network on the earth is showing. It keeps a
+   fixed-height row so the earth never shifts under the finger that just tapped
+   it. */
 .hero__readout {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 10px;
   min-height: 52px;
-  max-width: 100%;
+  width: min(92vw, 880px);
 }
-.hero__orbit { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; }
-/* Diffuse light behind the map — no ring, outline or frame. */
-.hero__orbit::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at 50% 30%, rgba(84, 196, 235, 0.55) 0%, rgba(38, 146, 197, 0.28) 36%, rgba(10, 40, 80, 0) 70%);
-  pointer-events: none;
+.hero__network {
+  order: -1;
+  flex-basis: 100%;
+  margin: 0 0 2px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: rgba(234, 255, 243, 0.82);
+  text-shadow: 0 1px 14px rgba(3, 18, 30, 0.95);
 }
 .hero__globe { position: absolute; inset: 0; cursor: pointer; z-index: 1; }
+
 .hero__globe canvas { display: block; width: 100%; height: 100%; }
 .hero__globe:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 4px; border-radius: 50%; }
-/* MapTiler's globe fills the same square as the stylised one and sits a layer
+/* MapTiler's globe fills the same circle as the stylised one and sits a layer
    below it, so the stylised earth can stand in until the tiles have drawn,
    then be unmounted to reveal it — with no move in between. The descendant
    selector is deliberate: MapLibre's own `.maplibregl-map` sets `position:
    relative`, and its stylesheet is injected at runtime, after this one — so the
-   container needs to be more specific to stay absolute and fill the orbit
+   container needs to be more specific to stay absolute and fill the palm
    (otherwise the map falls back to MapLibre's 400×300 default). */
-.hero__orbit .hero__globe--tiles {
+.hero__palm .hero__globe--tiles {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -404,7 +472,7 @@ h1, h2, h3, h4, h5 {
   z-index: 0;
   cursor: grab;
 }
-.hero__orbit .hero__globe--tiles:active { cursor: grabbing; }
+.hero__palm .hero__globe--tiles:active { cursor: grabbing; }
 /* Attribution and the MapTiler logo stay visible, as its terms require, but
    quietly: small type, over the light rather than in a panel. */
 .hero__globe--tiles .maplibregl-ctrl { z-index: 3; }
@@ -940,29 +1008,23 @@ h1, h2, h3, h4, h5 {
   .stat:nth-child(3) { border-left: none; }
   .grid--4 { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: 1fr 1fr; }
-  .hero__inner { grid-template-columns: 1fr; }
-  /* The earth keeps its place on small screens: it shrinks and centres under
-     the copy instead of being dropped. */
-  .hero__visual { gap: 16px; }
-  .hero__orbit { max-width: 320px; margin-inline: auto; }
-  /* In the stacked layout the orbit is no longer tucked into the desktop grid,
-     so its own glow box would show straight seams across the band. Hide it and
-     light the earth with a section-wide wash that fades to nothing at its own
-     edge (the last stop is fully transparent, so no edge can be seen). */
-  .hero__orbit::before { display: none; }
-  .hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: radial-gradient(
-      circle min(60vw, 250px) at 50% 76%,
-      rgba(84, 196, 235, 0.5) 0%,
-      rgba(38, 146, 197, 0.24) 40%,
-      rgba(10, 40, 80, 0) 100%
-    );
+  /* Up to tablet width the copy would sit on the hand, so the photograph
+     becomes a band at the top — the earth still resting on the palm — and the
+     copy follows it on the deep navy. */
+  .hero { display: block; min-height: 0; padding: 104px 0 64px; }
+  .hero__scene {
+    position: relative;
+    inset: auto;
+    height: 60vh;
+    min-height: 320px;
+    margin-bottom: 32px;
   }
+  /* The scrim only has to carry the read-out over the photo here. */
+  .hero__scene::after {
+    background: linear-gradient(0deg, rgba(3, 16, 27, 0.9) 0%, rgba(3, 16, 27, 0) 44%);
+  }
+  .hero__readout { bottom: 12px; min-height: 0; }
+  .hero__content { max-width: 720px; }
   .cta-banner { grid-template-columns: 1fr; padding: 44px; }
   .footer-cta { padding: 72px 0 56px; }
   .split { grid-template-columns: 1fr; gap: 40px; }
@@ -998,9 +1060,9 @@ h1, h2, h3, h4, h5 {
   .platform-card__content { flex: 0 0 auto; max-width: 100%; }
   .platform-card__cta--ghost { align-self: flex-start; margin-left: 0; padding: 16px 26px; }
   .stat:nth-child(2n + 3) { border-left: none; }
-  .hero { padding-top: 120px; }
-  .hero__inner { gap: 36px; }
-  .hero__orbit { max-width: 280px; }
+  .hero { padding-top: 96px; }
+  .hero__scene { height: 56vh; min-height: 300px; }
+  .hero__network { font-size: 0.72rem; }
   .hero__loc,
   .hero__hint { font-size: 0.78rem; padding: 7px 15px; }
   .hero__place { font-size: 0.78rem; padding: 6px 8px 6px 14px; gap: 10px; }

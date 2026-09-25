@@ -22,6 +22,8 @@ export default function Readout({ you, place, showHint, onClear }: ReadoutProps)
   const t = useTranslations("Home");
   return (
     <div className="hero__readout">
+      {/* What the earth above is showing: a network of visitors worldwide. */}
+      <p className="hero__network">{t("globeNetwork")}</p>
       {showHint && <p className="hero__hint">{t("globeHint")}</p>}
       <p className="hero__loc" hidden={!you} title={t("globeYou")}>
         {you ? `🧭 ${you}` : ""}
