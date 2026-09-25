@@ -237,8 +237,9 @@ h1, h2, h3, h4, h5 {
 .nav__links a:hover { background: var(--surface-soft); color: var(--primary); }
 .nav__links a.active { color: var(--primary); background: var(--primary-soft); }
 
-/* A group in the primary menu: "Resources" is a heading, not a link, and the
-   pages under it hang from a dropdown that a pointer, a tab or a tap can open. */
+/* A group in the primary menu: "About Us" and "Resources" are headings, not
+   links, and the pages under them hang from a dropdown that a pointer, a tab or
+   a tap can open. */
 .nav__group { position: relative; }
 .nav__group-label {
   display: inline-flex;
@@ -353,9 +354,9 @@ h1, h2, h3, h4, h5 {
   gap: 5px;
 }
 .nav__toggle span { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.3s ease, opacity 0.3s ease; }
-.nav__toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav__toggle.open span:nth-child(2) { opacity: 0; }
-.nav__toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav__toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav__toggle.is-open span:nth-child(2) { opacity: 0; }
+.nav__toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Hero ---------- */
 /* The hero is the photograph itself: the woman offering an open palm, with the
@@ -1252,7 +1253,7 @@ h1, h2, h3, h4, h5 {
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
-  .nav__links.open { transform: translateY(0); opacity: 1; }
+  .nav__links.is-open { transform: translateY(0); opacity: 1; }
   .nav__links a { padding: 13px 16px; border-radius: 12px; }
   /* The group's pages join the slide-down menu as an indented list, shown by the
      same tap that opens the group. */
@@ -1274,7 +1275,21 @@ h1, h2, h3, h4, h5 {
   .nav__submenu a { padding: 11px 14px; }
   .pub-year { grid-template-columns: 1fr; gap: 10px; }
   .pub-year__label { font-size: 1.05rem; }
-  .nav__toggle { display: flex; }
+  .nav__toggle { display: flex; width: 40px; height: 40px; }
+  .nav { gap: 12px; }
+  /* The header row has to hold the brand, the language pill, the Support CTA and
+     the hamburger between 24px gutters. On a phone the strap line and the
+     full-size lock-up push the row wider than the screen, which used to slide the
+     hamburger — the only way into this menu — off the right edge. Here the brand
+     is the part that gives way (the strap line is decoration, the name is not),
+     and the actions keep their intrinsic width so nothing is ever clipped. */
+  .brand { flex: 1 1 auto; min-width: 0; gap: 9px; }
+  .brand__logo { width: 32px; height: 32px; }
+  .brand__name { font-size: 0.9rem; }
+  .brand__tag { display: none; }
+  .nav__actions { flex: none; gap: 10px; }
+  .nav__actions .lang-toggle { padding: 8px 10px; }
+  .nav__actions .btn--sm { padding: 10px 16px; }
   .grid--2, .grid--3 { grid-template-columns: 1fr; }
   .grid--4 { grid-template-columns: 1fr 1fr; }
   .platform-grid, .news-grid { grid-template-columns: 1fr; }
@@ -1307,6 +1322,17 @@ h1, h2, h3, h4, h5 {
   .footer__grid { grid-template-columns: 1fr; }
   .cta-banner { padding: 32px; }
   .footer-cta { padding: 60px 0 48px; }
+}
+
+/* On the narrowest phones the wordmark would stack into four lines beside the
+   language pill, the Support CTA and the hamburger. It steps down one size
+   first, and on 360px-and-under screens the logo stands alone — the home link
+   keeps its accessible name. */
+@media (max-width: 380px) {
+  .brand__name { font-size: 0.84rem; }
+}
+@media (max-width: 360px) {
+  .brand__name { display: none; }
 }
 
 /* ---------- Donation options ---------- */

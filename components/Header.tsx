@@ -11,12 +11,20 @@ import Logo from "./Logo";
 type NavLink = { href: string; label: string };
 type NavGroup = { label: string; children: NavLink[] };
 
+/* "About Us" gathers the four pages that tell the story — where we are going,
+   how we practise, what we measure, and who walks with us. Like "Resources", it
+   is a heading without a page of its own, so it never links anywhere itself. */
 const NAV: (NavLink | NavGroup)[] = [
   { href: "/", label: "home" },
-  { href: "/vision", label: "vision" },
-  { href: "/science", label: "science" },
-  { href: "/practice", label: "practice" },
-  { href: "/community", label: "community" },
+  {
+    label: "aboutUs",
+    children: [
+      { href: "/vision", label: "vision" },
+      { href: "/practice", label: "practice" },
+      { href: "/science", label: "science" },
+      { href: "/community", label: "community" },
+    ],
+  },
   { label: "resources", children: [{ href: "/research", label: "researchPublications" }] },
   { href: "/contact", label: "contact" },
 ];
@@ -133,7 +141,8 @@ export default function Header() {
             {t("support")}
           </Link>
           <button
-            className="nav__toggle"
+            type="button"
+            className={`nav__toggle ${open ? "is-open" : ""}`}
             aria-label={t("menu")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
