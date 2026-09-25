@@ -93,6 +93,7 @@ export default async function ResearchPage({ params }: Props) {
                             paper.title
                           )}
                         </p>
+                        {paper.titleAlt && <p className="pub__title-alt" lang="zh-Hant">{paper.titleAlt}</p>}
                         <p className="pub__authors">{paper.authors}</p>
                         <p className="pub__meta">
                           {meta}

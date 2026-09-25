@@ -728,6 +728,8 @@ h1, h2, h3, h4, h5 {
 .pub__title { margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 1.02rem; line-height: 1.45; color: var(--text); }
 .pub__title a { color: inherit; text-decoration: none; }
 .pub__title a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+/* The Chinese rendering of a title, where the authors published one. */
+.pub__title-alt { margin: 0; font-size: 0.95rem; color: var(--text-muted); }
 .pub__authors { margin: 0; font-size: 0.92rem; color: var(--text-muted); }
 .pub__meta { margin: 0; font-size: 0.88rem; font-style: italic; color: var(--text-muted); }
 /* The DOI pill: the paper's own address, kept close to the venue it appeared in. */
